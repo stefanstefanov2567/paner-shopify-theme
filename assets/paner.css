@@ -707,3 +707,25 @@ a.paner-size:hover { border-color: var(--paner-ink); }
   .paner-stepper__btn { display: none; }
   .paner-body { padding: 0; }
 }
+
+/* =========================================================
+   PanER · Контакти
+   ========================================================= */
+.paner-contact { padding-bottom: 6rem; }
+.paner-contact__head { margin: 1.6rem 0 2.4rem; }
+.paner-contact__head .paner-eyebrow { margin-bottom: .8rem; }
+.paner-contact__content { margin-top: 1.2rem; max-width: 80rem; color: var(--paner-ink-2); }
+.paner-contact__layout { display: grid; grid-template-columns: minmax(0, 1fr) 38rem; gap: 2.8rem; align-items: start; }
+@media screen and (max-width: 989px) { .paner-contact__layout { grid-template-columns: 1fr; } }
+.paner-contact__form { display: flex; flex-direction: column; gap: 1.6rem; }
+.paner-contact__submit.button { margin-top: .8rem; min-height: 5.2rem; font-size: 1.6rem; font-weight: 700; align-self: flex-start; padding: 0 3.2rem; }
+.paner-contact__fine { text-align: left; }
+.paner-contact__done { margin: 0; }
+.paner-contact__aside { position: sticky; top: 2rem; display: flex; flex-direction: column; gap: 1.2rem; }
+.paner-contact__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.6rem; }
+.paner-contact__list li { display: flex; gap: 1.2rem; align-items: flex-start; font-size: 1.45rem; color: var(--paner-ink); }
+.paner-contact__list small { display: block; font-size: 1.2rem; color: var(--paner-ink-3); margin-bottom: .2rem; }
+.paner-contact__list a { color: var(--paner-ink); font-weight: 700; text-decoration: none; }
+.paner-contact__list a:hover { color: var(--paner-accent-ink); }
+.paner-contact__ic { width: 4rem; height: 4rem; flex: none; border-radius: 10px; background: var(--paner-accent-soft); color: var(--paner-accent-ink); display: flex; align-items: center; justify-content: center; }
+.paner-contact__link { color: var(--paner-accent-ink); font-weight: 600; text-decoration: none; }

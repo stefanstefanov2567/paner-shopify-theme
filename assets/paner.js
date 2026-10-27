@@ -417,6 +417,8 @@
     var params = new URLSearchParams(window.location.search);
     var product = params.get('contact[Продукт]');
     if (!product) return;
+    var field = $('[data-paner-prefill]');
+    if (field && !field.value) { field.value = product; return; }
     var body = $('form#ContactForm textarea[name="contact[body]"]') || $('textarea[name="contact[body]"]');
     if (body && !body.value) body.value = 'Запитване за: ' + product + '\n';
   })();

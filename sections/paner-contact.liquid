@@ -1,0 +1,150 @@
+{%- comment -%} PanER · Страница „Контакти / Запитване“ {%- endcomment -%}
+{%- liquid
+  assign phone = settings.paner_phone
+  assign email = settings.paner_email
+-%}
+<div class="paner-contact page-width">
+  <nav class="paner-crumbs" aria-label="Навигация">
+    <a href="{{ routes.root_url }}">Начало</a><span aria-hidden="true">›</span><span aria-current="page">{{ page.title | default: section.settings.heading }}</span>
+  </nav>
+
+  <div class="paner-contact__head">
+    <p class="paner-eyebrow paner-eyebrow--accent">{{ section.settings.eyebrow }}</p>
+    <h1 class="paner-col__title">{{ section.settings.heading }}</h1>
+    {%- if section.settings.text != blank -%}<div class="paner-col__desc">{{ section.settings.text }}</div>{%- endif -%}
+    {%- if page.content != blank and section.settings.show_page_content -%}<div class="paner-contact__content rte">{{ page.content }}</div>{%- endif -%}
+  </div>
+
+  <div class="paner-contact__layout">
+    <div class="paner-contact__main">
+      {%- form 'contact', id: 'ContactForm', class: 'paner-contact__form' -%}
+        {%- if form.posted_successfully? -%}
+          <div class="paner-cart__done paner-contact__done" tabindex="-1" autofocus>
+            <span class="paner-cart__done-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>
+            </span>
+            <h2 class="paner-cart__title">Съобщението е изпратено</h2>
+            <p>{{ section.settings.success_text }}</p>
+            <div class="paner-cart__done-actions"><a class="button paner-btn--dark" href="{{ routes.collections_url }}">Към каталога</a></div>
+          </div>
+        {%- else -%}
+          {%- if form.errors -%}
+            <div class="paner-inquiry__errors" role="alert">{{ form.errors | default_errors }}</div>
+          {%- endif -%}
+
+          <fieldset class="paner-card-box">
+            <legend>Данни за контакт</legend>
+            <div class="paner-grid2">
+              <label class="paner-field">Име и фамилия *<input class="paner-input" type="text" name="contact[name]" autocomplete="name" required value="{{ form.name | default: customer.name }}"></label>
+              <label class="paner-field">Фирма<input class="paner-input" type="text" name="contact[Фирма]" autocomplete="organization"></label>
+              <label class="paner-field">Имейл *<input class="paner-input" type="email" name="contact[email]" autocomplete="email" required spellcheck="false" autocapitalize="off" value="{{ form.email | default: customer.email }}"></label>
+              <label class="paner-field">Телефон<input class="paner-input" type="tel" name="contact[phone]" autocomplete="tel" value="{{ form.phone | default: customer.phone }}"></label>
+              <label class="paner-field">ЕИК / ДДС №<input class="paner-input" type="text" name="contact[ЕИК]" inputmode="numeric"></label>
+              <label class="paner-field">Тема
+                <select class="paner-select" name="contact[Тема]">
+                  {%- assign topics = section.settings.topics | split: ',' -%}
+                  {%- for t in topics -%}<option value="{{ t | strip | escape }}">{{ t | strip }}</option>{%- endfor -%}
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="paner-card-box">
+            <legend>Запитване</legend>
+            <div class="paner-grid2">
+              <label class="paner-field paner-field--wide">Артикул / норма / размер<input class="paner-input" type="text" name="contact[Артикул]" placeholder="напр. DIN 933 M10x40 8.8 поцинкован" data-paner-prefill></label>
+              <label class="paner-field">Количество<input class="paner-input" type="text" name="contact[Количество]" placeholder="напр. 4 кашона / 1200 бр."></label>
+              <label class="paner-field">Срок<input class="paner-input" type="text" name="contact[Срок]" placeholder="напр. до 15.11"></label>
+              <label class="paner-field paner-field--wide">Съобщение *<textarea class="paner-input" name="contact[body]" rows="5" required placeholder="Опишете какво ви трябва — може и целия списък от Excel.">{{ form.body }}</textarea></label>
+            </div>
+            <button type="submit" class="button paner-btn--accent paner-contact__submit">Изпрати запитването</button>
+            <p class="paner-summary__fine paner-contact__fine">{{ section.settings.fine_print }}</p>
+          </fieldset>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+
+    <aside class="paner-contact__aside">
+      <div class="paner-summary">
+        <b class="paner-summary__title">{{ section.settings.aside_heading }}</b>
+        <ul class="paner-contact__list" role="list">
+          {%- if phone != blank -%}
+            <li>
+              <span class="paner-contact__ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></span>
+              <span><small>Телефон</small><a href="tel:{{ phone | remove: ' ' }}">{{ phone }}</a></span>
+            </li>
+          {%- endif -%}
+          {%- if email != blank -%}
+            <li>
+              <span class="paner-contact__ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>
+              <span><small>Имейл</small><a href="mailto:{{ email }}">{{ email }}</a></span>
+            </li>
+          {%- endif -%}
+          {%- if section.settings.address != blank -%}
+            <li>
+              <span class="paner-contact__ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
+              <span><small>Адрес / склад</small>{{ section.settings.address }}</span>
+            </li>
+          {%- endif -%}
+          {%- if section.settings.hours != blank -%}
+            <li>
+              <span class="paner-contact__ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
+              <span><small>Работно време</small>{{ section.settings.hours }}</span>
+            </li>
+          {%- endif -%}
+        </ul>
+        {%- if section.settings.company != blank -%}<p class="paner-summary__note">{{ section.settings.company }}</p>{%- endif -%}
+      </div>
+
+      {%- for block in section.blocks -%}
+        <div class="paner-mini" {{ block.shopify_attributes }}>
+          <b>{{ block.settings.name }}</b>
+          {%- if block.settings.role != blank -%}<span>{{ block.settings.role }}</span>{%- endif -%}
+          {%- if block.settings.phone != blank -%}<a class="paner-contact__link" href="tel:{{ block.settings.phone | remove: ' ' }}">{{ block.settings.phone }}</a>{%- endif -%}
+          {%- if block.settings.email != blank -%}<a class="paner-contact__link" href="mailto:{{ block.settings.email }}">{{ block.settings.email }}</a>{%- endif -%}
+        </div>
+      {%- endfor -%}
+
+      {%- if section.settings.map_url != blank -%}
+        <a class="button button--secondary button--full-width" href="{{ section.settings.map_url }}" target="_blank" rel="noopener">Виж на картата →</a>
+      {%- endif -%}
+    </aside>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "PanER · Контакти",
+  "class": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Надзаглавие", "default": "ТЪРГОВСКИ ОТДЕЛ" },
+    { "type": "text", "id": "heading", "label": "Заглавие", "default": "Контакти и запитване" },
+    { "type": "richtext", "id": "text", "label": "Текст", "default": "<p>Изпратете запитване за цена, наличност или аналог — отговаряме до 1 работен ден.</p>" },
+    { "type": "checkbox", "id": "show_page_content", "label": "Покажи съдържанието на страницата", "default": false },
+    { "type": "text", "id": "topics", "label": "Теми (със запетая)", "default": "Запитване за цена,Наличност и доставка,Аналог / заместител,Сертификати и документи,Друго" },
+    { "type": "text", "id": "success_text", "label": "Текст след изпращане", "default": "Благодарим! Ще се свържем с вас до 1 работен ден." },
+    { "type": "text", "id": "fine_print", "label": "Текст под бутона", "default": "Запитването не ви задължава. Данните се използват само за отговор." },
+    { "type": "header", "content": "Информация вдясно" },
+    { "type": "text", "id": "aside_heading", "label": "Заглавие", "default": "Свържете се с нас" },
+    { "type": "text", "id": "address", "label": "Адрес / склад", "default": "[АДРЕС]" },
+    { "type": "text", "id": "hours", "label": "Работно време", "default": "Пон–Пет 08:00–17:00" },
+    { "type": "text", "id": "company", "label": "Фирмени данни", "default": "Панер ЕООД · ЕИК [ЕИК]" },
+    { "type": "url", "id": "map_url", "label": "Линк към Google Maps" },
+    { "type": "paragraph", "content": "Телефонът и имейлът се взимат от Theme settings → PanER · Каталог." }
+  ],
+  "blocks": [
+    {
+      "type": "person",
+      "name": "Търговец",
+      "limit": 4,
+      "settings": [
+        { "type": "text", "id": "name", "label": "Име", "default": "[ИМЕ]" },
+        { "type": "text", "id": "role", "label": "Роля", "default": "Търговец" },
+        { "type": "text", "id": "phone", "label": "Телефон" },
+        { "type": "text", "id": "email", "label": "Имейл" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "PanER · Контакти" } ]
+}
+{% endschema %}
