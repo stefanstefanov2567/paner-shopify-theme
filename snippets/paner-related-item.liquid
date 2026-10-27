@@ -1,0 +1,27 @@
+{%- comment -%} PanER · Артикул в „Комплектувай с“. Accepts: product, show_price {%- endcomment -%}
+{%- liquid
+  assign rv = product.selected_or_first_available_variant
+  assign rnorm = product.metafields.custom.norma.value | default: product.type
+  assign rbox = rv.metafields.custom.pack_box.value | default: product.metafields.custom.pack_box.value | default: 1
+-%}
+<li class="paner-rel" data-paner-row data-variant-id="{{ rv.id }}">
+  <a class="paner-rel__img" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+    {%- if product.featured_media -%}
+      {{ product.featured_media | image_url: width: 120 | image_tag: loading: 'lazy', alt: '', width: 56, height: 56 }}
+    {%- else -%}
+      {%- render 'paner-icon', name: 'nut' -%}
+    {%- endif -%}
+  </a>
+  <span class="paner-rel__body">
+    {%- if rnorm != blank -%}<span class="paner-rel__norm paner-mono">{{ rnorm }}</span>{%- endif -%}
+    <a class="paner-rel__title" href="{{ product.url }}">{{ product.title }}</a>
+    {%- if show_price == 'true' -%}<span class="paner-rel__meta">{{ rv.price | money }}</span>{%- else -%}<span class="paner-rel__meta">Кутия {{ rbox }} бр.</span>{%- endif -%}
+  </span>
+  <input type="hidden" value="1" data-paner-qty>
+  <input type="hidden" value="Кутия" data-pcs="{{ rbox }}" data-paner-pack-fixed>
+  {%- if rv.available or rv.inventory_policy == 'continue' -%}
+    <button type="button" class="paner-add paner-add--sm" data-paner-add aria-label="Добави {{ product.title | escape }} към запитването">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  {%- endif -%}
+</li>

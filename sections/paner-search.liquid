@@ -1,0 +1,72 @@
+{%- comment -%} PanER · Резултати от търсене (същата таблица като в категориите) {%- endcomment -%}
+<div class="paner-col page-width" data-paner-collection data-section-id="{{ section.id }}">
+  <nav class="paner-crumbs" aria-label="Навигация">
+    <a href="{{ routes.root_url }}">Начало</a><span aria-hidden="true">›</span><span aria-current="page">Търсене</span>
+  </nav>
+  <div class="paner-col__head">
+    <div>
+      <h1 class="paner-col__title">{% if search.terms != blank %}Резултати за „{{ search.terms | escape }}“{% else %}Търсене в каталога{% endif %}</h1>
+      <p class="paner-col__desc">Търсете по норма (933, ISO 4017), размер (M10x40) или код на артикула.</p>
+    </div>
+  </div>
+
+  <form action="{{ routes.search_url }}" method="get" role="search" class="paner-search paner-search--page">
+    <input type="hidden" name="type" value="product">
+    <input type="hidden" name="options[prefix]" value="last">
+    <label class="visually-hidden" for="PanerSearchPage">Търсене</label>
+    <span class="paner-search__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+    <input id="PanerSearchPage" class="paner-search__input" type="search" name="q" value="{{ search.terms | escape }}" placeholder="Норма, размер или код">
+    <button type="submit" class="paner-search__go" aria-label="Търси"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+  </form>
+
+  {%- if search.performed -%}
+    {%- paginate search.results by section.settings.per_page -%}
+      {%- liquid
+        capture show_price
+          render 'paner-show-price'
+        endcapture
+        assign show_price = show_price | strip
+        assign clear_url = routes.search_url | append: '?q=' | append: search.terms | append: '&type=product&options%5Bprefix%5D=last'
+        assign sort_by = search.sort_by | default: search.default_sort_by
+      -%}
+      <div class="paner-col__layout" data-paner-ajax-root>
+        {%- render 'paner-facets',
+          filters: search.filters,
+          sort_by: sort_by,
+          terms: search.terms,
+          results_count: search.results_count,
+          show_price: show_price,
+          clear_url: clear_url
+        -%}
+        <div class="paner-col__main">
+          {%- render 'paner-results',
+            products: search.results,
+            paginate: paginate,
+            filters: search.filters,
+            sort_options: search.sort_options,
+            sort_by: sort_by,
+            terms: search.terms,
+            results_count: search.results_count,
+            clear_url: clear_url,
+            section: section
+          -%}
+        </div>
+      </div>
+    {%- endpaginate -%}
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "PanER · Търсене",
+  "class": "section",
+  "settings": [
+    { "type": "range", "id": "per_page", "label": "Продукти на страница", "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "range", "id": "max_rows", "label": "Макс. размери на продукт", "min": 5, "max": 100, "step": 5, "default": 30 },
+    {
+      "type": "select", "id": "default_view", "label": "Изглед по подразбиране", "default": "table",
+      "options": [ { "value": "table", "label": "Таблица" }, { "value": "grid", "label": "Карти" } ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,23 @@
+{%- comment -%}
+  PanER · Статус на наличността за вариант.
+  Accepts: variant
+{%- endcomment -%}
+{%- liquid
+  assign low = settings.paner_low_stock | default: 20
+  assign next = variant.metafields.custom.next_delivery.value | default: variant.product.metafields.custom.next_delivery.value
+-%}
+{%- if variant.available -%}
+  {%- if variant.inventory_management == 'shopify' and variant.inventory_quantity > 0 -%}
+    {%- if variant.inventory_quantity <= low -%}
+      <span class="paner-stock paner-stock--low">{% if settings.paner_show_qty %}{{ variant.inventory_quantity }} бр.{% else %}Ограничено{% endif %}</span>
+    {%- else -%}
+      <span class="paner-stock paner-stock--ok">{% if settings.paner_show_qty %}{{ variant.inventory_quantity }} бр.{% else %}Наличен{% endif %}</span>
+    {%- endif -%}
+  {%- elsif variant.inventory_management == 'shopify' -%}
+    <span class="paner-stock paner-stock--out">По поръчка{% if next != blank %} · {{ next | date: '%d.%m' }}{% endif %}</span>
+  {%- else -%}
+    <span class="paner-stock paner-stock--ok">Наличен</span>
+  {%- endif -%}
+{%- else -%}
+  <span class="paner-stock paner-stock--out">Очаква се{% if next != blank %} {{ next | date: '%d.%m' }}{% endif %}</span>
+{%- endif -%}

@@ -1,0 +1,21 @@
+{%- comment -%}
+  PanER · Брояч (− N +).
+  Accepts: id, value, name (по избор), size ('lg' по избор), line (номер на ред в количката, по избор)
+{%- endcomment -%}
+<div class="paner-stepper{% if size == 'lg' %} paner-stepper--lg{% endif %}" data-paner-stepper>
+  <button type="button" class="paner-stepper__btn" data-paner-step="-1" aria-label="Намали">−</button>
+  <label class="visually-hidden" for="qty-{{ id }}">Брой</label>
+  <input
+    class="paner-stepper__input"
+    type="number"
+    inputmode="numeric"
+    min="{% if line %}0{% else %}1{% endif %}"
+    step="1"
+    value="{{ value | default: 1 }}"
+    id="qty-{{ id }}"
+    {% if name %}name="{{ name }}"{% endif %}
+    {% if line %}data-paner-line="{{ line }}"{% endif %}
+    data-paner-qty
+  >
+  <button type="button" class="paner-stepper__btn" data-paner-step="1" aria-label="Увеличи">+</button>
+</div>

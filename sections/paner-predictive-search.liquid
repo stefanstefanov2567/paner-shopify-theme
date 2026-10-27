@@ -1,0 +1,50 @@
+{%- comment -%}
+  PanER · Резултати от бързото търсене (зарежда се през Section Rendering API).
+{%- endcomment -%}
+{%- if predictive_search.performed -%}
+  {%- liquid
+    assign products = predictive_search.resources.products
+    assign collections = predictive_search.resources.collections
+  -%}
+  <div class="paner-ps" data-paner-ps>
+    {%- if products.size > 0 or collections.size > 0 -%}
+      {%- if collections.size > 0 -%}
+        <p class="paner-ps__label">Категории</p>
+        <ul class="paner-ps__cols" role="list">
+          {%- for c in collections limit: 4 -%}
+            <li><a class="paner-ps__chip" href="{{ c.url }}">{{ c.title }}</a></li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+      {%- if products.size > 0 -%}
+        <p class="paner-ps__label">Артикули</p>
+        <ul class="paner-ps__list" role="listbox" id="PanerSearchList">
+          {%- for p in products limit: 6 -%}
+            {%- assign v = p.selected_or_first_available_variant -%}
+            <li role="option">
+              <a class="paner-ps__item" href="{{ p.url }}">
+                <span class="paner-ps__thumb">
+                  {%- if p.featured_media -%}
+                    {{ p.featured_media | image_url: width: 96 | image_tag: loading: 'lazy', alt: p.title, width: 48, height: 48 }}
+                  {%- else -%}
+                    {%- render 'paner-icon', name: 'bolt' -%}
+                  {%- endif -%}
+                </span>
+                <span class="paner-ps__body">
+                  <span class="paner-ps__title">{{ p.title }}</span>
+                  {%- if v.sku != blank -%}<span class="paner-ps__sku paner-mono">{{ v.sku }}</span>{%- endif -%}
+                </span>
+                {%- if p.variants_count > 1 -%}<span class="paner-ps__meta">{{ p.variants_count }} размера</span>{%- endif -%}
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+      <a class="paner-ps__all" href="{{ routes.search_url }}?q={{ predictive_search.terms | url_encode }}&type=product&options%5Bprefix%5D=last">
+        Всички резултати за „{{ predictive_search.terms | escape }}“ →
+      </a>
+    {%- else -%}
+      <p class="paner-ps__empty">Няма резултати за „{{ predictive_search.terms | escape }}“. Опитайте с номер на норма (напр. „933“) или код.</p>
+    {%- endif -%}
+  </div>
+{%- endif -%}

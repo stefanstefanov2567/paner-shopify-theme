@@ -1,0 +1,40 @@
+{%- layout none -%}
+{%- comment -%}
+  PanER · JSON за „Добави по код“. /search?q=КОД&type=product&view=paner-sku
+  Връща вариант с точен код (SKU), иначе първия наличен вариант на първия резултат.
+{%- endcomment -%}
+{%- liquid
+  assign q = search.terms | strip | downcase
+  assign found = nil
+  for item in search.results
+    if item.object_type != 'product'
+      continue
+    endif
+    for v in item.variants
+      assign sku = v.sku | downcase
+      if sku == q
+        assign found = v
+        break
+      endif
+    endfor
+    if found
+      break
+    endif
+  endfor
+  assign exact = true
+  if found == nil
+    assign exact = false
+    for item in search.results
+      if item.object_type == 'product'
+        assign found = item.selected_or_first_available_variant
+        break
+      endif
+    endfor
+  endif
+-%}
+{%- if found -%}
+  {%- assign fbox = found.metafields.custom.pack_box.value | default: found.product.metafields.custom.pack_box.value | default: 1 -%}
+  {"found":true,"exact":{{ exact }},"id":{{ found.id }},"title":{{ found.product.title | append: ' ' | append: found.title | json }},"sku":{{ found.sku | json }},"pcs":{{ fbox | json }},"available":{% if found.available or found.inventory_policy == 'continue' %}true{% else %}false{% endif %}}
+{%- else -%}
+  {"found":false}
+{%- endif -%}

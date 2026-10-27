@@ -1,0 +1,17 @@
+{%- comment -%}
+  Връща "true", ако на текущия посетител трябва да се показват цени.
+  Използване: {%- capture show_price -%}{%- render 'paner-show-price' -%}{%- endcapture -%}
+{%- endcomment -%}
+{%- liquid
+  assign show = true
+  if settings.catalog_mode
+    assign show = false
+    if customer and settings.price_tag != blank
+      assign tag = settings.price_tag | strip
+      if customer.tags contains tag
+        assign show = true
+      endif
+    endif
+  endif
+  echo show
+-%}

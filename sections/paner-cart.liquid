@@ -1,0 +1,182 @@
+{%- comment -%}
+  PanER · Страница „Запитване“ — количката на Shopify се използва като списък за оферта (без плащане).
+  Изпращането става през контактната форма на Shopify: всички артикули отиват в писмото до магазина.
+{%- endcomment -%}
+{%- liquid
+  capture show_price
+    render 'paner-show-price'
+  endcapture
+  assign show_price = show_price | strip
+  assign total_pcs = 0
+  assign total_weight = 0
+-%}
+<div class="paner-cart page-width" data-paner-cart data-section-id="{{ section.id }}">
+  <ol class="paner-steps-bar" aria-label="Стъпки">
+    <li class="is-active"><span>1</span>Артикули</li>
+    <li class="is-active"><span>2</span>Данни на фирмата</li>
+    <li><span>3</span>Оферта до 1 работен ден</li>
+  </ol>
+
+  {%- form 'contact', id: 'PanerCartInquiry', class: 'paner-cart__form' -%}
+    {%- if form.posted_successfully? -%}
+      <div class="paner-cart__done" data-paner-cart-done>
+        <span class="paner-cart__done-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>
+        </span>
+        <h1 class="paner-cart__title">Запитването е изпратено</h1>
+        <p>Благодарим! Ще получите оферта с цени, наличност и срок на доставка до 1 работен ден.</p>
+        <div class="paner-cart__done-actions">
+          <a class="button paner-btn--dark" href="{{ routes.collections_url }}">Обратно към каталога</a>
+          {%- if settings.paner_phone != blank -%}<a class="button button--secondary" href="tel:{{ settings.paner_phone | remove: ' ' }}">{{ settings.paner_phone }}</a>{%- endif -%}
+        </div>
+      </div>
+    {%- elsif cart.item_count == 0 -%}
+      <div class="paner-cart__empty">
+        <h1 class="paner-cart__title">Списъкът за запитване е празен</h1>
+        <p>Добавете артикули от каталога или изпратете целия си списък наведнъж.</p>
+        <div class="paner-cart__done-actions">
+          <a class="button paner-btn--dark" href="{{ routes.collections_url }}">Към каталога</a>
+        </div>
+        {%- render 'paner-cart-add-code' -%}
+      </div>
+    {%- else -%}
+      {%- if form.errors -%}
+        <div class="paner-inquiry__errors" role="alert">{{ form.errors | default_errors }}</div>
+      {%- endif -%}
+
+      <div class="paner-cart__layout">
+        <div class="paner-cart__main">
+          <div class="paner-cart__head">
+            <h1 class="paner-cart__title">Запитване <span class="paner-cart__n">· {{ cart.item_count }} {% if cart.item_count == 1 %}опаковка{% else %}опаковки{% endif %}</span></h1>
+            <div class="paner-cart__tools">
+              <button type="button" class="button button--secondary paner-btn--sm" data-paner-print>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg>
+                Изтегли като PDF
+              </button>
+              <button type="button" class="button button--secondary paner-btn--sm" data-paner-clear>Изчисти списъка</button>
+            </div>
+          </div>
+
+          <div class="paner-table-wrap">
+            <table class="paner-table paner-table--cart">
+              <thead>
+                <tr>
+                  <th scope="col">Артикул</th>
+                  <th scope="col">Опаковка</th>
+                  <th scope="col">Брой</th>
+                  <th scope="col" class="paner-th-right">Общо бр.</th>
+                  {%- if show_price == 'true' -%}<th scope="col" class="paner-th-right">Сума</th>{%- endif -%}
+                  <th scope="col"><span class="visually-hidden">Премахни</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {%- for item in cart.items -%}
+                  {%- liquid
+                    assign pcs = item.properties['_pcs'] | default: item.variant.metafields.custom.pack_box.value | default: 1 | times: 1
+                    assign line_pcs = pcs | times: item.quantity
+                    assign total_pcs = total_pcs | plus: line_pcs
+                    assign w100 = item.variant.metafields.custom.weight_100.value | default: item.product.metafields.custom.weight_100.value
+                    if w100 != blank
+                      assign lw = line_pcs | times: w100 | divided_by: 100.0
+                      assign total_weight = total_weight | plus: lw
+                    endif
+                    assign pack = item.properties['Опаковка'] | default: 'Кутия'
+                    assign norm = item.product.metafields.custom.norma.value | default: item.product.type
+                  -%}
+                  <tr class="paner-row">
+                    <td class="paner-row__item">
+                      <a class="paner-row__title" href="{{ item.url }}">{{ item.product.title }}</a>
+                      <span class="paner-row__sku">
+                        {%- unless item.product.has_only_default_variant -%}{{ item.variant.title }} · {% endunless -%}
+                        {%- if item.sku != blank -%}<span class="paner-mono">{{ item.sku }}</span>{%- endif -%}
+                        {%- if norm != blank -%} · {{ norm }}{%- endif -%}
+                      </span>
+                      <span class="paner-row__stockline">{%- render 'paner-stock', variant: item.variant -%}</span>
+                    </td>
+                    <td class="paner-crow__pack" data-label="Опаковка">{{ pack }} · {{ pcs }} бр.</td>
+                    <td class="paner-crow__qty" data-label="Брой">{%- render 'paner-stepper', id: item.key, value: item.quantity, line: forloop.index -%}</td>
+                    <td data-label="Общо" class="paner-th-right paner-crow__tot"><b>{{ line_pcs }}</b> бр.</td>
+                    {%- if show_price == 'true' -%}<td data-label="Сума" class="paner-th-right paner-crow__sum"><b>{{ item.final_line_price | money }}</b></td>{%- endif -%}
+                    <td class="paner-row__rm">
+                      <button type="button" class="paner-icon-btn" data-paner-remove="{{ forloop.index }}" aria-label="Премахни {{ item.product.title | escape }}">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                      </button>
+                    </td>
+                  </tr>
+                {%- endfor -%}
+              </tbody>
+            </table>
+            {%- render 'paner-cart-add-code' -%}
+          </div>
+
+          <div class="paner-cart__fields">
+            <fieldset class="paner-card-box">
+              <legend>Данни на фирмата</legend>
+              <div class="paner-grid2">
+                <label class="paner-field">Фирма *<input class="paner-input" type="text" name="contact[Фирма]" autocomplete="organization" required></label>
+                <label class="paner-field">ЕИК / ДДС №<input class="paner-input" type="text" name="contact[ЕИК]" inputmode="numeric"></label>
+                <label class="paner-field">Лице за контакт *<input class="paner-input" type="text" name="contact[name]" autocomplete="name" required value="{{ customer.name }}"></label>
+                <label class="paner-field">Телефон *<input class="paner-input" type="tel" name="contact[phone]" autocomplete="tel" required value="{{ customer.phone }}"></label>
+                <label class="paner-field paner-field--wide">Имейл за офертата *<input class="paner-input" type="email" name="contact[email]" autocomplete="email" required value="{{ customer.email }}"></label>
+              </div>
+            </fieldset>
+            <fieldset class="paner-card-box">
+              <legend>Доставка и бележка</legend>
+              <div class="paner-radios">
+                <label class="paner-radio"><input type="radio" name="contact[Доставка]" value="До адрес / обект" checked><span><b>До адрес / обект</b><small>Куриер в цялата страна</small></span></label>
+                <label class="paner-radio"><input type="radio" name="contact[Доставка]" value="Вземане от склад"><span><b>Вземане от склад</b><small>{{ section.settings.pickup_text }}</small></span></label>
+              </div>
+              <div class="paner-grid2">
+                <label class="paner-field">Ваш номер на поръчка (PO)<input class="paner-input" type="text" name="contact[PO номер]"></label>
+                <label class="paner-field">Град / адрес на доставка<input class="paner-input" type="text" name="contact[Адрес]" autocomplete="street-address"></label>
+                <label class="paner-field paner-field--wide">Бележка (срок, обект, сертификат 3.1…)<textarea class="paner-input" name="contact[body]" rows="3"></textarea></label>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+
+        <aside class="paner-cart__aside">
+          <div class="paner-summary">
+            <b class="paner-summary__title">Обобщение</b>
+            <dl class="paner-summary__list">
+              <div><dt>Артикули</dt><dd>{{ cart.items.size }}</dd></div>
+              <div><dt>Опаковки</dt><dd>{{ cart.item_count }}</dd></div>
+              <div><dt>Общо бройки</dt><dd><b>{{ total_pcs }}</b></dd></div>
+              {%- if total_weight > 0 -%}<div><dt>Тегло ≈</dt><dd>{{ total_weight | round: 1 }} кг</dd></div>{%- endif -%}
+              {%- if show_price == 'true' -%}<div><dt>Сума без ДДС</dt><dd><b>{{ cart.total_price | money }}</b></dd></div>{%- endif -%}
+            </dl>
+            <p class="paner-summary__note">{{ section.settings.summary_note }}</p>
+            <button type="submit" class="button button--full-width paner-btn--accent paner-summary__submit">Изпрати запитването</button>
+            <p class="paner-summary__fine">Изпращането не е поръчка и не ви задължава.{% if settings.paner_email != blank %} Отговор от {{ settings.paner_email }}.{% endif %}</p>
+          </div>
+          {%- if settings.paner_phone != blank -%}
+            <a class="paner-mini paner-mini--link" href="tel:{{ settings.paner_phone | remove: ' ' }}">
+              <b>Предпочитате телефон?</b><span>{{ settings.paner_phone }}</span>
+            </a>
+          {%- endif -%}
+        </aside>
+      </div>
+
+      {%- capture lines -%}
+        {%- for item in cart.items -%}
+          {%- assign pcs = item.properties['_pcs'] | default: 1 | times: 1 -%}
+          {{ forloop.index }}. {{ item.product.title }}{% unless item.product.has_only_default_variant %} — {{ item.variant.title }}{% endunless %} | Код: {{ item.sku | default: '—' }} | {{ item.properties['Опаковка'] | default: 'Кутия' }} × {{ item.quantity }} = {{ pcs | times: item.quantity }} бр. | {{ shop.url }}{{ item.url }}
+{% endfor -%}
+        Общо: {{ cart.items.size }} артикула, {{ cart.item_count }} опаковки, {{ total_pcs }} бр.
+      {%- endcapture -%}
+      <input type="hidden" name="contact[Тип]" value="Запитване от списък ({{ cart.items.size }} артикула)">
+      <textarea name="contact[Артикули]" hidden aria-hidden="true" tabindex="-1">{{ lines | strip }}</textarea>
+    {%- endif -%}
+  {%- endform -%}
+</div>
+
+{% schema %}
+{
+  "name": "PanER · Запитване",
+  "class": "section",
+  "settings": [
+    { "type": "text", "id": "pickup_text", "label": "Текст за вземане от склад", "default": "След потвърждение на офертата" },
+    { "type": "text", "id": "summary_note", "label": "Бележка в обобщението", "default": "Ще получите оферта с фирмени цени, наличност и срок на доставка до 1 работен ден." }
+  ]
+}
+{% endschema %}

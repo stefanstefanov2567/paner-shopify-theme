@@ -1,0 +1,114 @@
+{%- comment -%}
+  PanER · Страница на категория: подкатегории, филтри, таблица по размери.
+  Подкатегориите се взимат от меню със същия handle като колекцията (Navigation → меню „boltove“ за колекция „boltove“),
+  или от менюто, избрано в настройките на секцията.
+{%- endcomment -%}
+{%- liquid
+  assign sub_menu = section.settings.sub_menu
+  if linklists[collection.handle].links.size > 0
+    assign sub_menu = linklists[collection.handle]
+  endif
+-%}
+<div class="paner-col page-width" data-paner-collection data-section-id="{{ section.id }}">
+  <nav class="paner-crumbs" aria-label="Навигация">
+    <a href="{{ routes.root_url }}">Начало</a>
+    <span aria-hidden="true">›</span>
+    {%- if collection.handle != 'all' -%}
+      <a href="{{ routes.collections_url }}">Каталог</a>
+      <span aria-hidden="true">›</span>
+    {%- endif -%}
+    <span aria-current="page">{{ collection.title }}</span>
+  </nav>
+
+  <div class="paner-col__head">
+    <div>
+      <h1 class="paner-col__title">{{ collection.title }}</h1>
+      {%- if collection.description != blank and section.settings.show_description -%}
+        <div class="paner-col__desc rte">{{ collection.description }}</div>
+      {%- endif -%}
+    </div>
+    {%- if section.settings.show_inquiry_btn -%}
+      <a class="button button--secondary paner-col__cta" href="{{ settings.inquiry_link | default: '/pages/contact' }}">
+        Не намирате размера? Запитване
+      </a>
+    {%- endif -%}
+  </div>
+
+  {%- if sub_menu.links.size > 0 -%}
+    <ul class="paner-subcats" role="list">
+      {%- for link in sub_menu.links -%}
+        <li>
+          <a class="paner-subcat{% if link.active %} is-active{% endif %}" href="{{ link.url }}"{% if link.active %} aria-current="page"{% endif %}>
+            <span class="paner-subcat__img">
+              {%- if link.type == 'collection_link' and link.object.image -%}
+                {{ link.object.image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '', width: 52, height: 30 }}
+              {%- else -%}
+                {%- render 'paner-icon', name: section.settings.sub_icon -%}
+              {%- endif -%}
+            </span>
+            {{ link.title }}
+            {%- if link.type == 'collection_link' -%}<span class="paner-subcat__n">{{ link.object.products_count }}</span>{%- endif -%}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+
+  {%- paginate collection.products by section.settings.per_page -%}
+    {%- liquid
+      capture show_price
+        render 'paner-show-price'
+      endcapture
+      assign show_price = show_price | strip
+      assign sort_by = collection.sort_by | default: collection.default_sort_by
+    -%}
+    <div class="paner-col__layout" data-paner-ajax-root>
+      {%- render 'paner-facets',
+        filters: collection.filters,
+        sort_by: sort_by,
+        results_count: collection.products_count,
+        show_price: show_price,
+        clear_url: collection.url
+      -%}
+      <div class="paner-col__main">
+        {%- render 'paner-results',
+          products: collection.products,
+          paginate: paginate,
+          filters: collection.filters,
+          sort_options: collection.sort_options,
+          sort_by: sort_by,
+          results_count: collection.products_count,
+          clear_url: collection.url,
+          section: section
+        -%}
+      </div>
+    </div>
+  {%- endpaginate -%}
+</div>
+
+{% schema %}
+{
+  "name": "PanER · Категория",
+  "class": "section",
+  "settings": [
+    { "type": "range", "id": "per_page", "label": "Продукти на страница", "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "range", "id": "max_rows", "label": "Макс. размери на продукт в таблицата", "min": 5, "max": 100, "step": 5, "default": 30 },
+    {
+      "type": "select", "id": "default_view", "label": "Изглед по подразбиране", "default": "table",
+      "options": [ { "value": "table", "label": "Таблица" }, { "value": "grid", "label": "Карти" } ]
+    },
+    { "type": "checkbox", "id": "show_description", "label": "Покажи описанието на колекцията", "default": true },
+    { "type": "checkbox", "id": "show_inquiry_btn", "label": "Бутон за запитване", "default": true },
+    { "type": "header", "content": "Подкатегории" },
+    { "type": "link_list", "id": "sub_menu", "label": "Меню с подкатегории", "info": "Ако има меню със същия handle като колекцията, то се използва автоматично." },
+    {
+      "type": "select", "id": "sub_icon", "label": "Илюстрация по подразбиране", "default": "bolt",
+      "options": [
+        { "value": "bolt", "label": "Болт" }, { "value": "nut", "label": "Гайка" }, { "value": "washer", "label": "Шайба" },
+        { "value": "screw", "label": "Винт" }, { "value": "rod", "label": "Шпилка" }, { "value": "rivet", "label": "Нит" },
+        { "value": "anchor", "label": "Анкер" }, { "value": "turnbuckle", "label": "Обтегач" }
+      ]
+    }
+  ]
+}
+{% endschema %}

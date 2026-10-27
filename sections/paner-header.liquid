@@ -1,0 +1,200 @@
+{%- comment -%}
+  PanER · Хедър: горна лента, лого, търсене с категория, профил, запитване, меню по категории.
+{%- endcomment -%}
+{%- liquid
+  assign inquiry_count = cart.items.size
+  assign phone = settings.paner_phone
+  assign email = settings.paner_email
+-%}
+<div class="paner-header" data-paner-header>
+  {%- if section.settings.show_utility -%}
+    <div class="paner-util">
+      <div class="page-width paner-util__inner">
+        <p class="paner-util__left">
+          {%- if section.settings.util_strong != blank -%}<strong>{{ section.settings.util_strong }}</strong>{%- endif -%}
+          {%- if section.settings.util_text != blank -%}<span> · {{ section.settings.util_text }}</span>{%- endif -%}
+          {%- if section.settings.util_text2 != blank -%}<span class="paner-util__extra">{{ section.settings.util_text2 }}</span>{%- endif -%}
+        </p>
+        <div class="paner-util__right">
+          {%- if phone != blank -%}<a href="tel:{{ phone | remove: ' ' }}">{{ phone }}</a>{%- endif -%}
+          {%- if email != blank -%}<a href="mailto:{{ email }}">{{ email }}</a>{%- endif -%}
+          {%- if localization.available_languages.size > 1 -%}
+            {%- form 'localization', class: 'paner-util__lang' -%}
+              <label class="visually-hidden" for="PanerLang">{{ 'localization.language_label' | t }}</label>
+              <select id="PanerLang" name="locale_code" onchange="this.form.submit()">
+                {%- for language in localization.available_languages -%}
+                  <option value="{{ language.iso_code }}"{% if language.iso_code == localization.language.iso_code %} selected{% endif %}>{{ language.iso_code | upcase }}</option>
+                {%- endfor -%}
+              </select>
+            {%- endform -%}
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+
+  <header class="paner-hdr">
+    <div class="page-width paner-hdr__inner">
+      <details class="paner-drawer" data-paner-drawer>
+        <summary class="paner-icon-btn paner-hdr__burger" aria-label="Меню">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </summary>
+        <div class="paner-drawer__panel" role="dialog" aria-label="Меню">
+          <div class="paner-drawer__top">
+            {%- render 'paner-logo', class: 'paner-drawer__logo', uid: 'drawer' -%}
+            <button type="button" class="paner-icon-btn" aria-label="Затвори" data-paner-drawer-close>
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+            </button>
+          </div>
+          <nav class="paner-drawer__nav" aria-label="Категории">
+            <ul role="list">
+              {%- for link in section.settings.menu.links -%}
+                <li>
+                  {%- if link.links != blank -%}
+                    <details>
+                      <summary>{{ link.title }}<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+                      <ul role="list">
+                        <li><a href="{{ link.url }}">Всички — {{ link.title }}</a></li>
+                        {%- for child in link.links -%}<li><a href="{{ child.url }}">{{ child.title }}</a></li>{%- endfor -%}
+                      </ul>
+                    </details>
+                  {%- else -%}
+                    <a href="{{ link.url }}">{{ link.title }}</a>
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+            {%- if section.settings.secondary_menu.links.size > 0 -%}
+              <ul role="list" class="paner-drawer__secondary">
+                {%- for link in section.settings.secondary_menu.links -%}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </nav>
+          <div class="paner-drawer__contact">
+            {%- if phone != blank -%}<a href="tel:{{ phone | remove: ' ' }}">{{ phone }}</a>{%- endif -%}
+            {%- if email != blank -%}<a href="mailto:{{ email }}">{{ email }}</a>{%- endif -%}
+          </div>
+        </div>
+      </details>
+
+      <a href="{{ routes.root_url }}" class="paner-hdr__logo" aria-label="{{ shop.name | escape }} — начало">
+        {%- if settings.logo != blank -%}
+          {{ settings.logo | image_url: width: 400 | image_tag: class: 'paner-hdr__logo-img', alt: shop.name, preload: true }}
+        {%- else -%}
+          {%- render 'paner-logo', class: 'paner-hdr__logo-svg', uid: 'hdr' -%}
+        {%- endif -%}
+      </a>
+
+      <form action="{{ routes.search_url }}" method="get" role="search" class="paner-search" data-paner-search>
+        <input type="hidden" name="type" value="product">
+        <input type="hidden" name="options[prefix]" value="last">
+        {%- if section.settings.show_scope and shop.types.size > 0 -%}
+          <label class="visually-hidden" for="PanerSearchScope">Категория</label>
+          <select id="PanerSearchScope" class="paner-search__scope" name="filter.p.product_type" data-paner-search-scope>
+            <option value="">Всички категории</option>
+            {%- for type in shop.types -%}
+              {%- if type != blank -%}<option value="{{ type | escape }}">{{ type }}</option>{%- endif -%}
+            {%- endfor -%}
+          </select>
+        {%- endif -%}
+        <label class="visually-hidden" for="PanerSearchInput">Търсене</label>
+        <span class="paner-search__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+        <input
+          id="PanerSearchInput"
+          class="paner-search__input"
+          type="search"
+          name="q"
+          value="{{ search.terms | escape }}"
+          placeholder="{{ section.settings.search_placeholder | escape }}"
+          autocomplete="off"
+          role="combobox"
+          aria-expanded="false"
+          aria-controls="PanerSearchResults"
+          data-paner-search-input
+        >
+        <button type="submit" class="paner-search__go" aria-label="Търси">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </button>
+        <div id="PanerSearchResults" class="paner-search__results" data-paner-search-results hidden></div>
+      </form>
+
+      <div class="paner-hdr__actions">
+        {%- if shop.customer_accounts_enabled -%}
+          <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="paner-hbtn paner-hbtn--ghost">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+            <span class="paner-hbtn__txt">
+              <small>Фирмен профил</small>
+              <b>{%- if customer -%}{{ customer.first_name | default: customer.company_available_locations.first.company.name | default: 'Моят профил' }}{%- else -%}Вход / Регистрация{%- endif -%}</b>
+            </span>
+          </a>
+        {%- endif -%}
+        <a href="{{ routes.cart_url }}" class="paner-hbtn paner-hbtn--accent" id="cart-icon-bubble">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+          <span class="paner-hbtn__txt">
+            <small>Запитване</small>
+            <b><span data-paner-count>{{ inquiry_count }}</span> <span data-paner-count-label>{% if inquiry_count == 1 %}артикул{% else %}артикула{% endif %}</span></b>
+          </span>
+          <span class="paner-hbtn__badge" data-paner-count{% if inquiry_count == 0 %} hidden{% endif %}>{{ inquiry_count }}</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <nav class="paner-cnav" aria-label="Категории">
+    <div class="page-width paner-cnav__inner">
+      {%- if section.settings.all_link_label != blank -%}
+        <a class="paner-cnav__all" href="{{ section.settings.all_link | default: routes.collections_url }}">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          {{ section.settings.all_link_label }}
+        </a>
+      {%- endif -%}
+      <ul class="paner-cnav__list" role="list">
+        {%- for link in section.settings.menu.links -%}
+          <li class="paner-cnav__item">
+            {%- if link.links != blank -%}
+              <details class="paner-cnav__dd" data-paner-dd>
+                <summary class="paner-cnav__link{% if link.child_active or link.active %} is-active{% endif %}">{{ link.title }}</summary>
+                <div class="paner-cnav__menu">
+                  <a class="paner-cnav__menu-all" href="{{ link.url }}">Всички {{ link.title | downcase }} →</a>
+                  <ul role="list">
+                    {%- for child in link.links -%}<li><a href="{{ child.url }}"{% if child.active %} aria-current="page"{% endif %}>{{ child.title }}</a></li>{%- endfor -%}
+                  </ul>
+                </div>
+              </details>
+            {%- else -%}
+              <a class="paner-cnav__link{% if link.active %} is-active{% endif %}" href="{{ link.url }}"{% if link.active %} aria-current="page"{% endif %}>{{ link.title }}</a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+      {%- if section.settings.secondary_menu.links.size > 0 -%}
+        <ul class="paner-cnav__secondary" role="list">
+          {%- for link in section.settings.secondary_menu.links -%}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </nav>
+</div>
+
+{% schema %}
+{
+  "name": "PanER · Хедър",
+  "class": "paner-header-section",
+  "settings": [
+    { "type": "header", "content": "Горна лента" },
+    { "type": "checkbox", "id": "show_utility", "label": "Покажи горната лента", "default": true },
+    { "type": "text", "id": "util_strong", "label": "Удебелен текст", "default": "Само за фирми" },
+    { "type": "text", "id": "util_text", "label": "Текст", "default": "оферта до 1 работен ден" },
+    { "type": "text", "id": "util_text2", "label": "Втори текст", "default": "Доставка в цялата страна" },
+    { "type": "paragraph", "content": "Телефонът и имейлът се взимат от Theme settings → PanER · Каталог." },
+    { "type": "header", "content": "Търсене" },
+    { "type": "text", "id": "search_placeholder", "label": "Подсказка в полето", "default": "Норма, размер или код — напр. „933 M10x40“" },
+    { "type": "checkbox", "id": "show_scope", "label": "Избор на категория до търсенето", "default": true, "info": "Използва типовете продукти (Product type)." },
+    { "type": "header", "content": "Меню" },
+    { "type": "link_list", "id": "menu", "label": "Меню с категории", "default": "main-menu" },
+    { "type": "link_list", "id": "secondary_menu", "label": "Допълнителни линкове (вдясно)" },
+    { "type": "text", "id": "all_link_label", "label": "Бутон „Асортимент“ — текст", "default": "Асортимент" },
+    { "type": "url", "id": "all_link", "label": "Бутон „Асортимент“ — линк" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,63 @@
+{%- comment -%} PanER · Футър {%- endcomment -%}
+<footer class="paner-footer">
+  <div class="page-width">
+    <div class="paner-footer__grid">
+      <div class="paner-footer__brand">
+        {%- render 'paner-logo', class: 'paner-footer__logo', variant: 'dark', uid: 'ftr' -%}
+        {%- if section.settings.company != blank -%}<p>{{ section.settings.company }}</p>{%- endif -%}
+        {%- if section.settings.address != blank -%}<p>{{ section.settings.address }}</p>{%- endif -%}
+      </div>
+      {%- for block in section.blocks -%}
+        <div class="paner-footer__col" {{ block.shopify_attributes }}>
+          <h2 class="paner-footer__h">{{ block.settings.heading | default: block.settings.menu.title }}</h2>
+          <ul role="list">
+            {%- for link in block.settings.menu.links -%}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{%- endfor -%}
+          </ul>
+        </div>
+      {%- endfor -%}
+      <div class="paner-footer__col">
+        <h2 class="paner-footer__h">{{ section.settings.contact_heading }}</h2>
+        <ul role="list">
+          {%- if section.settings.contact_name != blank -%}<li>{{ section.settings.contact_name }}</li>{%- endif -%}
+          {%- if settings.paner_phone != blank -%}<li><a href="tel:{{ settings.paner_phone | remove: ' ' }}">{{ settings.paner_phone }}</a></li>{%- endif -%}
+          {%- if settings.paner_email != blank -%}<li><a href="mailto:{{ settings.paner_email }}">{{ settings.paner_email }}</a></li>{%- endif -%}
+          {%- if section.settings.hours != blank -%}<li>{{ section.settings.hours }}</li>{%- endif -%}
+        </ul>
+      </div>
+    </div>
+    <div class="paner-footer__bottom">
+      <span>© {{ 'now' | date: '%Y' }} {{ section.settings.company | default: shop.name }}</span>
+      {%- if shop.policies.size > 0 -%}
+        <ul role="list" class="paner-footer__policies">
+          {%- for policy in shop.policies -%}<li><a href="{{ policy.url }}">{{ policy.title }}</a></li>{%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "PanER · Футър",
+  "class": "paner-footer-section",
+  "settings": [
+    { "type": "text", "id": "company", "label": "Фирма и ЕИК", "default": "Панер ЕООД · ЕИК [ЕИК]" },
+    { "type": "text", "id": "address", "label": "Адрес", "default": "[АДРЕС]" },
+    { "type": "text", "id": "contact_heading", "label": "Контакти — заглавие", "default": "Търговски отдел" },
+    { "type": "text", "id": "contact_name", "label": "Лице за контакт" },
+    { "type": "text", "id": "hours", "label": "Работно време", "default": "Пон–Пет 08:00–17:00" }
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Меню",
+      "limit": 3,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Заглавие" },
+        { "type": "link_list", "id": "menu", "label": "Меню", "default": "footer" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "PanER · Футър", "blocks": [ { "type": "menu" } ] } ]
+}
+{% endschema %}

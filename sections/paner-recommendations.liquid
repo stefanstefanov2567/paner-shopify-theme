@@ -1,0 +1,14 @@
+{%- comment -%} PanER · Препоръки (зарежда се асинхронно от продуктовата страница) {%- endcomment -%}
+{%- liquid
+  capture show_price
+    render 'paner-show-price'
+  endcapture
+  assign show_price = show_price | strip
+-%}
+{%- if recommendations.performed and recommendations.products_count > 0 -%}
+  <ul role="list" class="paner-related__list">
+    {%- for rp in recommendations.products limit: 4 -%}
+      {%- render 'paner-related-item', product: rp, show_price: show_price -%}
+    {%- endfor -%}
+  </ul>
+{%- endif -%}

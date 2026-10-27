@@ -1,0 +1,320 @@
+{%- comment -%}
+  PanER · Продуктова страница: снимки, чертеж, опаковки, запитване, смяна на размера, параметри, документи, комплектувай.
+{%- endcomment -%}
+{%- liquid
+  assign v = product.selected_or_first_available_variant
+  assign vm = v.metafields.custom
+  assign pm = product.metafields.custom
+
+  capture show_price
+    render 'paner-show-price'
+  endcapture
+  assign show_price = show_price | strip
+
+  assign norma = vm.norma.value | default: pm.norma.value
+  assign iso = vm.iso.value | default: pm.iso.value
+  assign d = vm.diameter.value | default: pm.diameter.value
+  assign l = vm.length.value | default: pm.length.value
+  assign b = vm.thread_length.value | default: pm.thread_length.value
+  assign k = vm.head_height.value | default: pm.head_height.value
+  assign s = vm.head_size.value | default: pm.head_size.value
+  assign pitch = vm.thread_pitch.value | default: pm.thread_pitch.value
+  assign cls = vm.strength_class.value | default: pm.strength_class.value
+  assign material = vm.material.value | default: pm.material.value
+  assign coating = vm.coating.value | default: pm.coating.value
+  assign weight = vm.weight_100.value | default: pm.weight_100.value
+  assign drawing = vm.drawing.value | default: pm.drawing.value
+  assign shape = vm.drawing_type.value | default: pm.drawing_type.value
+  if shape == blank
+    if l == blank and d != blank
+      assign shape = 'nut'
+    else
+      assign shape = 'bolt'
+    endif
+  endif
+
+  assign box = vm.pack_box.value | default: pm.pack_box.value | default: 1
+  assign carton = vm.pack_carton.value | default: pm.pack_carton.value
+  assign pallet = vm.pack_pallet.value | default: pm.pack_pallet.value
+  assign carton_pcs = box | times: carton
+  assign pallet_pcs = carton_pcs | times: pallet
+
+  assign tech_sheet = vm.tech_sheet.value | default: pm.tech_sheet.value
+  assign certificate = vm.certificate.value | default: pm.certificate.value
+  assign declaration = vm.declaration.value | default: pm.declaration.value
+  assign next = vm.next_delivery.value | default: pm.next_delivery.value
+
+  assign crumb = collection | default: product.collections.first
+  assign can_add = false
+  if v.available or v.inventory_policy == 'continue'
+    assign can_add = true
+  endif
+-%}
+
+<div class="paner-pdp page-width" data-paner-pdp>
+  <nav class="paner-crumbs" aria-label="Навигация">
+    <a href="{{ routes.root_url }}">Начало</a><span aria-hidden="true">›</span>
+    {%- if crumb -%}<a href="{{ crumb.url }}">{{ crumb.title }}</a><span aria-hidden="true">›</span>{%- endif -%}
+    <span aria-current="page">{{ product.title }}</span>
+  </nav>
+
+  <div class="paner-pdp__top">
+    <div class="paner-pdp__media">
+      <div class="paner-gallery">
+        {%- if product.media.size > 0 -%}
+          <ul class="paner-gallery__main" role="list">
+            {%- for media in product.media -%}
+              <li id="Media-{{ section.id }}-{{ media.id }}" class="paner-gallery__slide">
+                {%- liquid
+                  assign load = 'lazy'
+                  if forloop.first
+                    assign load = 'eager'
+                  endif
+                  assign media_alt = media.alt | default: product.title
+                -%}
+                {%- if media.media_type == 'image' -%}
+                  {{ media | image_url: width: 1200 | image_tag: widths: '400, 600, 900, 1200', sizes: '(min-width: 990px) 560px, 100vw', loading: load, alt: media_alt }}
+                {%- else -%}
+                  {{ media | media_tag: image_size: '1200x' }}
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+          {%- if product.media.size > 1 -%}
+            <ul class="paner-gallery__thumbs" role="list">
+              {%- for media in product.media -%}
+                <li><a href="#Media-{{ section.id }}-{{ media.id }}" data-paner-thumb>{{ media.preview_image | image_url: width: 160 | image_tag: loading: 'lazy', alt: '', width: 80, height: 80 }}</a></li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        {%- else -%}
+          <div class="paner-gallery__ph">
+            {%- render 'paner-icon', name: shape -%}
+            <span class="paner-gallery__ph-label">Снимка — предстои заснемане</span>
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.show_drawing -%}
+        {%- if drawing != blank -%}
+          <figure class="paner-drawing">
+            <figcaption class="paner-drawing__cap"><b>Технически чертеж{% if norma != blank %} · {{ norma }}{% endif %}</b></figcaption>
+            {{ drawing | image_url: width: 1200 | image_tag: loading: 'lazy', widths: '400, 800, 1200', alt: 'Технически чертеж' }}
+          </figure>
+        {%- elsif d != blank -%}
+          {%- capture dtitle -%}Технически чертеж{% if norma != blank %} · {{ norma }}{% endif %}{%- endcapture -%}
+          {%- render 'paner-drawing', shape: shape, d: d, l: l, b: b, k: k, s: s, title: dtitle -%}
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+
+    <div class="paner-pdp__info">
+      <div class="paner-badges">
+        {%- if norma != blank -%}<span class="paner-badge paner-badge--dark paner-mono">{{ norma }}</span>{%- endif -%}
+        {%- if iso != blank -%}<span class="paner-badge paner-mono">{{ iso }}</span>{%- endif -%}
+        {%- if certificate != blank -%}<span class="paner-badge paner-badge--ok">Сертификат 3.1</span>{%- endif -%}
+      </div>
+      <h1 class="paner-pdp__title">{{ product.title }}{% unless product.has_only_default_variant %} <span class="paner-pdp__variant">{{ v.title }}</span>{% endunless %}</h1>
+      <p class="paner-pdp__codes">
+        {%- if v.sku != blank -%}<span>Код: <b class="paner-mono">{{ v.sku }}</b></span>{%- endif -%}
+        {%- if v.barcode != blank -%}<span>EAN: <b class="paner-mono">{{ v.barcode }}</b></span>{%- endif -%}
+        {%- if product.vendor != blank and section.settings.show_vendor -%}<span>Производител: <b>{{ product.vendor }}</b></span>{%- endif -%}
+      </p>
+
+      <div class="paner-buy" data-paner-row data-variant-id="{{ v.id }}" data-paner-hints>
+        <div class="paner-buy__top">
+          <div>
+            {%- if show_price == 'true' -%}
+              <span class="paner-buy__label">Цена без ДДС</span>
+              <span class="paner-buy__price">{{ v.price | money }} <small>/ {{ settings.price_unit | default: 'бр.' }}</small></span>
+            {%- else -%}
+              <span class="paner-buy__label">Цена</span>
+              <span class="paner-buy__price paner-buy__price--ask">По запитване</span>
+              <span class="paner-buy__hint">Индивидуална фирмена оферта до 1 работен ден</span>
+            {%- endif -%}
+          </div>
+          <div class="paner-buy__stock">
+            {%- render 'paner-stock', variant: v -%}
+            {%- if next != blank -%}<span class="paner-buy__hint">Следваща доставка: {{ next | date: '%d.%m.%Y' }}</span>{%- endif -%}
+          </div>
+        </div>
+
+        <fieldset class="paner-packs">
+          <legend>Опаковка</legend>
+          <div class="paner-packs__grid">
+            <label class="paner-pack">
+              <input type="radio" name="pack-{{ section.id }}" value="Кутия" data-pcs="{{ box }}" data-paner-pack checked>
+              <span class="paner-pack__ui"><b>Кутия</b><small>{{ box }} бр.</small></span>
+            </label>
+            {%- if carton != blank -%}
+              <label class="paner-pack">
+                <input type="radio" name="pack-{{ section.id }}" value="Кашон" data-pcs="{{ carton_pcs }}" data-paner-pack>
+                <span class="paner-pack__ui"><b>Кашон</b><small>{{ carton }} кутии · {{ carton_pcs }} бр.</small></span>
+              </label>
+            {%- endif -%}
+            {%- if carton != blank and pallet != blank -%}
+              <label class="paner-pack">
+                <input type="radio" name="pack-{{ section.id }}" value="Палет" data-pcs="{{ pallet_pcs }}" data-paner-pack>
+                <span class="paner-pack__ui"><b>Палет</b><small>{{ pallet }} кашона · {{ pallet_pcs }} бр.</small></span>
+              </label>
+            {%- endif -%}
+          </div>
+        </fieldset>
+
+        <div class="paner-buy__row">
+          <div class="paner-buy__qty">
+            <span class="paner-buy__label" id="QtyLabel-{{ section.id }}">Брой опаковки</span>
+            {%- render 'paner-stepper', id: section.id, value: 1, size: 'lg' -%}
+          </div>
+          {%- if can_add -%}
+            <button type="button" class="button paner-btn--accent paner-buy__add" data-paner-add>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+              Добави към запитването
+            </button>
+          {%- else -%}
+            <a class="button button--secondary paner-buy__add" href="{{ settings.inquiry_link | default: '/pages/contact' }}">Изчерпан — изпрати запитване</a>
+          {%- endif -%}
+        </div>
+        <p class="paner-buy__calc">
+          = <b data-paner-total>{{ box }}</b> бр.{% if weight != blank %} · тегло ≈ <span data-paner-weight data-per100="{{ weight }}">—</span> кг{% endif %}
+          {%- if carton != blank -%}<span class="paner-buy__next" data-paner-next data-box="{{ box }}" data-carton="{{ carton }}"></span>{%- endif -%}
+        </p>
+      </div>
+
+      {%- if tech_sheet != blank or certificate != blank or declaration != blank or section.settings.show_trust -%}
+        <div class="paner-pdp__cards">
+          {%- if section.settings.show_trust -%}
+            <div class="paner-mini">
+              <b>Доставка и плащане</b>
+              <span>{{ section.settings.trust_text }}</span>
+            </div>
+          {%- endif -%}
+          {%- if tech_sheet != blank or certificate != blank or declaration != blank -%}
+            <div class="paner-mini">
+              <b>Документи</b>
+              {%- if tech_sheet != blank -%}<a class="paner-dl" href="{{ tech_sheet.url }}" target="_blank" rel="noopener">Технически лист · PDF</a>{%- endif -%}
+              {%- if certificate != blank -%}<a class="paner-dl" href="{{ certificate.url }}" target="_blank" rel="noopener">Сертификат 3.1 · PDF</a>{%- endif -%}
+              {%- if declaration != blank -%}<a class="paner-dl" href="{{ declaration.url }}" target="_blank" rel="noopener">Декларация за съответствие</a>{%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- unless product.has_only_default_variant -%}
+    <div class="paner-sizes" id="sizes">
+      <b class="paner-sizes__label">Смени размера:</b>
+      {%- for option in product.options_with_values -%}
+        <div class="paner-sizes__group">
+          <span class="paner-sizes__name">{{ option.name }}</span>
+          <ul class="paner-sizes__list" role="list">
+            {%- for value in option.values -%}
+              <li>
+                {%- if value.selected -%}
+                  <span class="paner-size is-active" aria-current="true">{{ value }}</span>
+                {%- elsif value.variant -%}
+                  <a class="paner-size{% unless value.available %} is-out{% endunless %}" href="{{ value.variant.url }}#sizes">{{ value }}</a>
+                {%- else -%}
+                  <span class="paner-size is-disabled" aria-disabled="true">{{ value }}</span>
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endfor -%}
+    </div>
+  {%- endunless -%}
+
+  <div class="paner-pdp__bottom">
+    <div class="paner-tabs" data-paner-tabs>
+      <div class="paner-tabs__nav" role="tablist">
+        <button type="button" role="tab" class="paner-tabs__tab" aria-selected="true" aria-controls="tab-specs-{{ section.id }}" id="t-specs-{{ section.id }}">Технически параметри</button>
+        {%- if product.description != blank -%}
+          <button type="button" role="tab" class="paner-tabs__tab" aria-selected="false" aria-controls="tab-desc-{{ section.id }}" id="t-desc-{{ section.id }}">Описание</button>
+        {%- endif -%}
+        <button type="button" role="tab" class="paner-tabs__tab" aria-selected="false" aria-controls="tab-pack-{{ section.id }}" id="t-pack-{{ section.id }}">Опаковка и логистика</button>
+      </div>
+
+      <div class="paner-tabs__panel" role="tabpanel" id="tab-specs-{{ section.id }}" aria-labelledby="t-specs-{{ section.id }}">
+        <table class="paner-specs__table">
+          <tbody>
+            {%- if norma != blank or iso != blank -%}<tr><th scope="row">Норма</th><td>{{ norma }}{% if norma != blank and iso != blank %} / {% endif %}{{ iso }}</td></tr>{%- endif -%}
+            {%- unless product.has_only_default_variant -%}
+              {%- for option in product.options_with_values -%}<tr><th scope="row">{{ option.name }}</th><td>{{ option.selected_value }}</td></tr>{%- endfor -%}
+            {%- endunless -%}
+            {%- if d != blank -%}<tr><th scope="row">Резба / диаметър d</th><td>{{ d }}{% if pitch != blank %} · стъпка {{ pitch }}{% endif %}</td></tr>{%- endif -%}
+            {%- if l != blank -%}<tr><th scope="row">Дължина l</th><td>{{ l }}{% if b != blank %} · резба b {{ b }}{% endif %}</td></tr>{%- endif -%}
+            {%- if s != blank or k != blank -%}<tr><th scope="row">Размер под ключ s · височина k</th><td>{{ s | default: '—' }} · {{ k | default: '—' }}</td></tr>{%- endif -%}
+            {%- if cls != blank -%}<tr><th scope="row">Клас на якост</th><td>{{ cls }}</td></tr>{%- endif -%}
+            {%- if material != blank or coating != blank -%}<tr><th scope="row">Материал · покритие</th><td>{{ material | default: '—' }} · {{ coating | default: '—' }}</td></tr>{%- endif -%}
+            {%- if v.sku != blank -%}<tr><th scope="row">Код</th><td class="paner-mono">{{ v.sku }}</td></tr>{%- endif -%}
+          </tbody>
+        </table>
+      </div>
+
+      {%- if product.description != blank -%}
+        <div class="paner-tabs__panel rte" role="tabpanel" id="tab-desc-{{ section.id }}" aria-labelledby="t-desc-{{ section.id }}" hidden>
+          {{ product.description }}
+        </div>
+      {%- endif -%}
+
+      <div class="paner-tabs__panel" role="tabpanel" id="tab-pack-{{ section.id }}" aria-labelledby="t-pack-{{ section.id }}" hidden>
+        <table class="paner-specs__table">
+          <tbody>
+            <tr><th scope="row">Кутия</th><td>{{ box }} бр.</td></tr>
+            {%- if carton != blank -%}<tr><th scope="row">Кашон</th><td>{{ carton }} кутии · {{ carton_pcs }} бр.</td></tr>{%- endif -%}
+            {%- if pallet != blank -%}<tr><th scope="row">Палет</th><td>{{ pallet }} кашона · {{ pallet_pcs }} бр.</td></tr>{%- endif -%}
+            {%- if weight != blank -%}<tr><th scope="row">Тегло</th><td>≈ {{ weight }} кг / 100 бр.</td></tr>{%- endif -%}
+            {%- if v.weight > 0 -%}<tr><th scope="row">Тегло на опаковка</th><td>{{ v.weight | weight_with_unit }}</td></tr>{%- endif -%}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {%- assign related = pm.complementary.value -%}
+    {%- if related != blank or section.settings.show_recommendations -%}
+      <aside class="paner-related" aria-label="Комплектувай с">
+        <h2 class="paner-related__title">{{ section.settings.related_heading }}</h2>
+        {%- if related != blank -%}
+          <ul role="list" class="paner-related__list">
+            {%- for rp in related limit: 4 -%}
+              {%- render 'paner-related-item', product: rp, show_price: show_price -%}
+            {%- endfor -%}
+          </ul>
+        {%- else -%}
+          <div data-paner-recs data-url="{{ routes.product_recommendations_url }}?product_id={{ product.id }}&limit=4&intent=complementary&section_id=paner-recommendations" data-fallback="{{ routes.product_recommendations_url }}?product_id={{ product.id }}&limit=4&intent=related&section_id=paner-recommendations"></div>
+        {%- endif -%}
+      </aside>
+    {%- endif -%}
+  </div>
+</div>
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": {{ product.title | json }},
+    "url": {{ request.origin | append: product.url | json }},
+    {%- if v.sku != blank -%}"sku": {{ v.sku | json }},{%- endif -%}
+    {%- if v.barcode != blank -%}"gtin13": {{ v.barcode | json }},{%- endif -%}
+    {%- if product.featured_media -%}"image": [{{ product.featured_media | image_url: width: 1200 | prepend: 'https:' | json }}],{%- endif -%}
+    "brand": { "@type": "Brand", "name": {{ product.vendor | default: shop.name | json }} },
+    "description": {{ product.description | strip_html | truncate: 300 | json }}
+  }
+</script>
+
+{% schema %}
+{
+  "name": "PanER · Продукт",
+  "class": "section",
+  "settings": [
+    { "type": "checkbox", "id": "show_drawing", "label": "Покажи технически чертеж", "default": true, "info": "Използва метаполето custom.drawing (изображение) или се генерира автоматично от размерите d, l, b, k, s." },
+    { "type": "checkbox", "id": "show_vendor", "label": "Покажи производител", "default": false },
+    { "type": "checkbox", "id": "show_trust", "label": "Карта „Доставка и плащане“", "default": true },
+    { "type": "text", "id": "trust_text", "label": "Текст", "default": "Доставка с куриер до адрес или обект в цялата страна. Плащане по фактура." },
+    { "type": "text", "id": "related_heading", "label": "Заглавие „Комплектувай“", "default": "Комплектувай с" },
+    { "type": "checkbox", "id": "show_recommendations", "label": "Автоматични препоръки, ако няма избрани", "default": true, "info": "Ръчно: метаполе custom.complementary (списък продукти). Автоматично: Search & Discovery → Product recommendations." }
+  ]
+}
+{% endschema %}

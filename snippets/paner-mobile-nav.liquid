@@ -1,0 +1,30 @@
+{%- comment -%} PanER · Долна навигация на мобилно {%- endcomment -%}
+<nav class="paner-mnav" aria-label="Бърза навигация">
+  <a href="{{ routes.collections_url }}" class="paner-mnav__item{% if request.page_type == 'collection' or request.page_type == 'list-collections' %} is-active{% endif %}">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/></svg>
+    Каталог
+  </a>
+  <a href="{{ routes.search_url }}" class="paner-mnav__item{% if request.page_type == 'search' %} is-active{% endif %}" data-paner-focus-search>
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    Търсене
+  </a>
+  <a href="{{ routes.cart_url }}" class="paner-mnav__item{% if request.page_type == 'cart' %} is-active{% endif %}">
+    <span class="paner-mnav__icon">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+      <span class="paner-mnav__badge" data-paner-count{% if cart.items.size == 0 %} hidden{% endif %}>{{ cart.items.size }}</span>
+    </span>
+    Запитване
+  </a>
+  {%- if shop.customer_accounts_enabled -%}
+    <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="paner-mnav__item{% if request.page_type contains 'customers' %} is-active{% endif %}">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+      Профил
+    </a>
+  {%- else -%}
+    <a href="{{ settings.inquiry_link | default: '/pages/contact' }}" class="paner-mnav__item">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
+      Контакт
+    </a>
+  {%- endif -%}
+</nav>
+<div class="paner-toast" role="status" aria-live="polite" data-paner-toast hidden></div>

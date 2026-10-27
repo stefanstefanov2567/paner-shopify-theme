@@ -1,0 +1,155 @@
+{%- comment -%}
+  PanER · Резултати: активни филтри, сортиране, изглед таблица/карти, таблица по размери, групово добавяне, страници.
+  Accepts:
+  - products: {Array} (в paginate)
+  - paginate: {Object}
+  - filters, sort_options, sort_by, terms, results_count, clear_url, section
+{%- endcomment -%}
+{%- liquid
+  capture show_price
+    render 'paner-show-price'
+  endcapture
+  assign show_price = show_price | strip
+  assign filtered = false
+  for filter in filters
+    if filter.active_values.size > 0
+      assign filtered = true
+    endif
+    if filter.type == 'boolean' and filter.true_value.active
+      assign filtered = true
+    endif
+  endfor
+  assign max_rows = section.settings.max_rows | default: 30
+-%}
+<div class="paner-results" data-paner-view="{{ section.settings.default_view | default: 'table' }}">
+  <div class="paner-results__bar">
+    <div class="paner-results__tags">
+      <button type="button" class="paner-results__filter-btn" data-paner-filters-open>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+        Филтри
+      </button>
+      <b class="paner-results__count">{{ results_count }} {% if results_count == 1 %}артикул{% else %}артикула{% endif %}</b>
+      {%- for filter in filters -%}
+        {%- if filter.type == 'price_range' -%}
+          {%- if filter.min_value.value != null or filter.max_value.value != null -%}
+            <a class="paner-tag" href="{{ filter.url_to_remove }}" data-paner-ajax>
+              {{ filter.min_value.value | money | default: '0' }}–{{ filter.max_value.value | money | default: '∞' }}
+              <span aria-hidden="true">✕</span><span class="visually-hidden">Премахни</span>
+            </a>
+          {%- endif -%}
+        {%- else -%}
+          {%- for value in filter.active_values -%}
+            <a class="paner-tag" href="{{ value.url_to_remove }}" data-paner-ajax>
+              {{ value.label }} <span aria-hidden="true">✕</span><span class="visually-hidden">Премахни {{ value.label }}</span>
+            </a>
+          {%- endfor -%}
+          {%- if filter.type == 'boolean' and filter.true_value.active -%}
+            <a class="paner-tag" href="{{ filter.true_value.url_to_remove }}" data-paner-ajax>{{ filter.label }} <span aria-hidden="true">✕</span></a>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+    <div class="paner-results__tools">
+      <label class="paner-sort">
+        <span class="visually-hidden">Подреди</span>
+        <select class="paner-select paner-select--sm" data-paner-sort>
+          {%- for option in sort_options -%}
+            {%- if show_price != 'true' and option.value contains 'price' -%}{%- continue -%}{%- endif -%}
+            <option value="{{ option.value | escape }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+      </label>
+      <div class="paner-view" role="group" aria-label="Изглед">
+        <button type="button" class="paner-view__btn" data-paner-set-view="table" aria-label="Таблица">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <button type="button" class="paner-view__btn" data-paner-set-view="grid" aria-label="Карти">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {%- if products.size > 0 -%}
+    <div class="paner-table-wrap" data-paner-bulk-scope>
+      <table class="paner-table">
+        <thead>
+          <tr>
+            <th scope="col" class="paner-row__sel"><input type="checkbox" class="paner-cb" data-paner-select-all aria-label="Избери всички"></th>
+            <th scope="col">Артикул</th>
+            <th scope="col">Норма</th>
+            <th scope="col">Размер</th>
+            <th scope="col">Клас</th>
+            <th scope="col">Наличност</th>
+            {%- if show_price == 'true' -%}<th scope="col" class="paner-th-right">Цена</th>{%- endif -%}
+            <th scope="col">Опаковка</th>
+            <th scope="col">Брой</th>
+            <th scope="col"><span class="visually-hidden">Добави</span></th>
+          </tr>
+        </thead>
+        {%- for product in products -%}
+          <tbody class="paner-tbody">
+            {%- render 'paner-variant-rows', product: product, show_price: show_price, filtered: filtered, max_rows: max_rows -%}
+          </tbody>
+        {%- endfor -%}
+      </table>
+
+      <div class="paner-bulk" data-paner-bulkbar hidden>
+        <span class="paner-bulk__info"><b data-paner-bulk-count>0</b> избрани</span>
+        <button type="button" class="button paner-btn--accent paner-bulk__btn" data-paner-bulk-add>Добави избраните към запитването</button>
+      </div>
+    </div>
+
+    <ul class="paner-grid" role="list">
+      {%- for product in products -%}
+        {%- assign v = product.selected_or_first_available_variant -%}
+        <li class="paner-card">
+          <a class="paner-card__media" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+            {%- if product.featured_media -%}
+              {{ product.featured_media | image_url: width: 500 | image_tag: loading: 'lazy', widths: '250, 500', sizes: '(min-width: 990px) 25vw, 50vw', alt: product.title }}
+            {%- else -%}
+              {%- render 'paner-icon', name: 'bolt' -%}
+            {%- endif -%}
+          </a>
+          <div class="paner-card__body">
+            {%- assign card_norm = product.metafields.custom.norma.value | default: product.type -%}
+            {%- if card_norm != blank -%}<span class="paner-card__norm paner-mono">{{ card_norm }}</span>{%- endif -%}
+            <a class="paner-card__title" href="{{ product.url }}">{{ product.title }}</a>
+            <span class="paner-card__meta">
+              {%- if product.variants_count > 1 -%}{{ product.variants_count }} размера{%- elsif v.sku != blank -%}<span class="paner-mono">{{ v.sku }}</span>{%- endif -%}
+            </span>
+            {%- render 'paner-stock', variant: v -%}
+            {%- if show_price == 'true' -%}<b class="paner-card__price">от {{ product.price_min | money }}</b>{%- endif -%}
+          </div>
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- else -%}
+    <div class="paner-empty">
+      <p><b>Няма артикули по тези критерии.</b></p>
+      <p>Премахнете някой филтър или <a href="{{ settings.inquiry_link | default: '/pages/contact' }}">изпратете запитване</a> — ще намерим артикула за вас.</p>
+      {%- if clear_url != blank -%}<a class="button button--secondary" href="{{ clear_url }}" data-paner-ajax>Изчисти филтрите</a>{%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- if paginate.pages > 1 -%}
+    <nav class="paner-pages" aria-label="Страници">
+      <span class="paner-pages__info">Страница {{ paginate.current_page }} от {{ paginate.pages }}</span>
+      <ul role="list">
+        {%- if paginate.previous -%}<li><a class="paner-pages__btn" href="{{ paginate.previous.url }}" data-paner-ajax aria-label="Предишна">‹</a></li>{%- endif -%}
+        {%- for part in paginate.parts -%}
+          <li>
+            {%- if part.is_link -%}
+              <a class="paner-pages__btn" href="{{ part.url }}" data-paner-ajax>{{ part.title }}</a>
+            {%- elsif part.title contains 'hellip' -%}
+              <span class="paner-pages__gap">…</span>
+            {%- else -%}
+              <span class="paner-pages__btn is-current" aria-current="page">{{ part.title }}</span>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+        {%- if paginate.next -%}<li><a class="paner-pages__btn" href="{{ paginate.next.url }}" data-paner-ajax aria-label="Следваща">›</a></li>{%- endif -%}
+      </ul>
+    </nav>
+  {%- endif -%}
+</div>

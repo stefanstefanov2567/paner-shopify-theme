@@ -1,0 +1,101 @@
+{%- comment -%}
+  PanER · Редове в таблицата за един продукт (по един ред за всеки размер/вариант).
+  Accepts:
+  - product: {Object}
+  - show_price: {String} "true" | "false"
+  - filtered: {Boolean} има ли активни филтри (показват се само съвпадащите варианти)
+  - max_rows: {Number}
+{%- endcomment -%}
+{%- liquid
+  assign pm = product.metafields.custom
+  assign shown = 0
+  assign hidden_count = 0
+-%}
+{%- for variant in product.variants -%}
+  {%- liquid
+    if filtered and variant.matched == false
+      continue
+    endif
+    if shown >= max_rows
+      assign hidden_count = hidden_count | plus: 1
+      continue
+    endif
+    assign shown = shown | plus: 1
+    assign vm = variant.metafields.custom
+
+    assign norma = vm.norma.value | default: pm.norma.value | default: product.type
+    assign iso = vm.iso.value | default: pm.iso.value
+    assign cls = vm.strength_class.value | default: pm.strength_class.value | default: vm.material.value | default: pm.material.value
+    assign coat = vm.coating.value | default: pm.coating.value
+
+    assign size = variant.title
+    if product.has_only_default_variant
+      assign dia = vm.diameter.value | default: pm.diameter.value
+      assign len = vm.length.value | default: pm.length.value
+      if dia != blank and len != blank
+        assign size = dia | append: ' × ' | append: len
+      elsif dia != blank
+        assign size = dia
+      else
+        assign size = '—'
+      endif
+    endif
+
+    assign box = vm.pack_box.value | default: pm.pack_box.value | default: 1
+    assign carton = vm.pack_carton.value | default: pm.pack_carton.value
+    assign pallet = vm.pack_pallet.value | default: pm.pack_pallet.value
+    assign carton_pcs = box | times: carton
+    assign pallet_pcs = carton_pcs | times: pallet
+
+    assign row_id = 'r' | append: variant.id
+  -%}
+  <tr class="paner-row" data-paner-row data-variant-id="{{ variant.id }}">
+    <td class="paner-row__sel">
+      <input type="checkbox" class="paner-cb" id="sel-{{ row_id }}" data-paner-select aria-label="Избери {{ product.title | escape }} {{ size | escape }}"{% unless variant.available or variant.inventory_policy == 'continue' %} disabled{% endunless %}>
+    </td>
+    <td class="paner-row__item">
+      <a href="{{ variant.url }}" class="paner-row__title">{{ product.title }}</a>
+      {%- if variant.sku != blank -%}<span class="paner-row__sku paner-mono">{{ variant.sku }}</span>{%- endif -%}
+    </td>
+    <td class="paner-row__norm paner-mono" data-label="Норма">{{ norma }}{% if iso != blank %}<span class="paner-row__iso">{{ iso }}</span>{% endif %}</td>
+    <td class="paner-row__size" data-label="Размер"><a href="{{ variant.url }}">{{ size }}</a></td>
+    <td class="paner-row__cls" data-label="Клас">{{ cls | default: '—' }}{% if coat != blank %}<span class="paner-row__coat">{{ coat }}</span>{% endif %}</td>
+    <td class="paner-row__stock" data-label="Наличност">{%- render 'paner-stock', variant: variant -%}</td>
+    {%- if show_price == 'true' -%}
+      <td class="paner-row__price" data-label="Цена">
+        <b>{{ variant.price | money }}</b>
+        {%- if variant.compare_at_price > variant.price -%}<s>{{ variant.compare_at_price | money }}</s>{%- endif -%}
+        <small>/ {{ settings.price_unit | default: 'бр.' }}</small>
+      </td>
+    {%- endif -%}
+    <td class="paner-row__pack" data-label="Опаковка">
+      <label class="visually-hidden" for="pack-{{ row_id }}">Опаковка</label>
+      <select class="paner-select paner-select--sm" id="pack-{{ row_id }}" data-paner-pack>
+        <option value="Кутия" data-pcs="{{ box }}">Кутия {{ box }} бр.</option>
+        {%- if carton != blank -%}<option value="Кашон" data-pcs="{{ carton_pcs }}">Кашон {{ carton_pcs }} бр.</option>{%- endif -%}
+        {%- if carton != blank and pallet != blank -%}<option value="Палет" data-pcs="{{ pallet_pcs }}">Палет {{ pallet_pcs }} бр.</option>{%- endif -%}
+      </select>
+    </td>
+    <td class="paner-row__qty" data-label="Брой">
+      {%- render 'paner-stepper', id: row_id, value: 1 -%}
+    </td>
+    <td class="paner-row__add">
+      {%- if variant.available or variant.inventory_policy == 'continue' -%}
+        <button type="button" class="paner-add" data-paner-add aria-label="Добави {{ product.title | escape }} {{ size | escape }} към запитването">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          <span class="paner-add__txt">Добави</span>
+        </button>
+      {%- else -%}
+        <a class="paner-add paner-add--ghost" href="{{ settings.inquiry_link | default: '/pages/contact' }}?contact%5BПродукт%5D={{ product.title | append: ' ' | append: size | url_encode }}" aria-label="Запитване за {{ product.title | escape }} {{ size | escape }}">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+          <span class="paner-add__txt">Уведоми ме</span>
+        </a>
+      {%- endif -%}
+    </td>
+  </tr>
+{%- endfor -%}
+{%- if hidden_count > 0 -%}
+  <tr class="paner-row paner-row--more">
+    <td colspan="12"><a href="{{ product.url }}">Още {{ hidden_count }} размера на {{ product.title }} →</a></td>
+  </tr>
+{%- endif -%}
