@@ -1,0 +1,49 @@
+{%- comment -%}
+  PanER · Карта на категория.
+  Accepts: title, url, c (collection, по избор), link_type, icon
+{%- endcomment -%}
+{%- liquid
+  assign img = nil
+  if link_type == 'collection_link' and c.image
+    assign img = c.image
+  elsif link_type == 'collection_link' and c.featured_image
+    assign img = c.featured_image
+  endif
+  assign ic = icon | default: 'bolt'
+  assign h = c.handle | default: title | downcase
+  if h contains 'gaik' or h contains 'гайк' or h contains 'nut'
+    assign ic = 'nut'
+  elsif h contains 'shaib' or h contains 'шайб' or h contains 'washer'
+    assign ic = 'washer'
+  elsif h contains 'vint' or h contains 'винт' or h contains 'screw'
+    assign ic = 'screw'
+  elsif h contains 'shpil' or h contains 'шпил' or h contains 'rod'
+    assign ic = 'rod'
+  elsif h contains 'nit' or h contains 'нит' or h contains 'rivet'
+    assign ic = 'rivet'
+  elsif h contains 'anker' or h contains 'анкер' or h contains 'dubel' or h contains 'дюбел'
+    assign ic = 'anchor'
+  elsif h contains 'obteg' or h contains 'обтег'
+    assign ic = 'turnbuckle'
+  elsif h contains 'bolt' or h contains 'болт'
+    assign ic = 'bolt'
+  endif
+-%}
+<li>
+  <a class="paner-cat" href="{{ url }}">
+    <span class="paner-cat__media">
+      {%- if img -%}
+        {{ img | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300, 600', sizes: '(min-width: 990px) 300px, 50vw', alt: title }}
+      {%- else -%}
+        {%- render 'paner-icon', name: ic -%}
+      {%- endif -%}
+    </span>
+    <span class="paner-cat__row">
+      <strong class="paner-cat__title">{{ title }}</strong>
+      {%- if link_type == 'collection_link' and c.products_count -%}<span class="paner-cat__count">{{ c.products_count }}</span>{%- endif -%}
+    </span>
+    {%- if link_type == 'collection_link' and c.description != blank -%}
+      <span class="paner-cat__norms">{{ c.description | strip_html | truncate: 70 }}</span>
+    {%- endif -%}
+  </a>
+</li>

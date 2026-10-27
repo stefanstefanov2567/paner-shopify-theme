@@ -1,0 +1,44 @@
+{%- comment -%} PanER · Обикновена страница (За нас, Общи условия, Доставка…) {%- endcomment -%}
+<div class="paner-page page-width{% if section.settings.narrow %} paner-page--narrow{% endif %}">
+  <nav class="paner-crumbs" aria-label="Навигация">
+    <a href="{{ routes.root_url }}">Начало</a><span aria-hidden="true">›</span><span aria-current="page">{{ page.title }}</span>
+  </nav>
+  <div class="paner-page__layout">
+    <article class="paner-page__main">
+      <h1 class="paner-col__title">{{ page.title }}</h1>
+      <div class="paner-page__content rte">{{ page.content }}</div>
+    </article>
+    {%- if section.settings.show_aside -%}
+      <aside class="paner-page__aside">
+        {%- if section.settings.aside_menu.links.size > 0 -%}
+          <nav class="paner-summary" aria-label="Информация">
+            <b class="paner-summary__title">{{ section.settings.aside_menu.title }}</b>
+            <ul class="paner-page__menu" role="list">
+              {%- for link in section.settings.aside_menu.links -%}
+                <li><a href="{{ link.url }}"{% if link.active %} aria-current="page" class="is-active"{% endif %}>{{ link.title }}</a></li>
+              {%- endfor -%}
+            </ul>
+          </nav>
+        {%- endif -%}
+        <div class="paner-mini">
+          <b>Имате въпрос?</b>
+          <span>Търговският отдел отговаря до 1 работен ден.</span>
+          {%- if settings.paner_phone != blank -%}<a class="paner-contact__link" href="tel:{{ settings.paner_phone | remove: ' ' }}">{{ settings.paner_phone }}</a>{%- endif -%}
+          <a class="button paner-btn--dark" href="{{ settings.inquiry_link | default: '/pages/contact' }}">Изпрати запитване</a>
+        </div>
+      </aside>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "PanER · Страница",
+  "class": "section",
+  "settings": [
+    { "type": "checkbox", "id": "show_aside", "label": "Странична колона с меню и контакт", "default": true },
+    { "type": "link_list", "id": "aside_menu", "label": "Меню в страничната колона", "default": "footer" },
+    { "type": "checkbox", "id": "narrow", "label": "Тесен текст (за дълги текстове)", "default": true }
+  ]
+}
+{% endschema %}

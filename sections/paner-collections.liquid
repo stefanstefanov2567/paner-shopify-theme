@@ -1,0 +1,71 @@
+{%- comment -%} PanER · Целият каталог (/collections) {%- endcomment -%}
+{%- liquid
+  assign skip = 'all,frontpage' | split: ','
+  if section.settings.menu.links.size > 0
+    assign use_menu = true
+  endif
+-%}
+<div class="paner-col page-width">
+  <nav class="paner-crumbs" aria-label="Навигация">
+    <a href="{{ routes.root_url }}">Начало</a><span aria-hidden="true">›</span><span aria-current="page">{{ section.settings.heading }}</span>
+  </nav>
+  <div class="paner-col__head">
+    <div>
+      <h1 class="paner-col__title">{{ section.settings.heading }}</h1>
+      {%- if section.settings.text != blank -%}<div class="paner-col__desc">{{ section.settings.text }}</div>{%- endif -%}
+    </div>
+    <form action="{{ routes.search_url }}" method="get" role="search" class="paner-search paner-search--inline">
+      <input type="hidden" name="type" value="product">
+      <input type="hidden" name="options[prefix]" value="last">
+      <label class="visually-hidden" for="PanerCatSearch">Търсене в каталога</label>
+      <span class="paner-search__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+      <input id="PanerCatSearch" class="paner-search__input" type="search" name="q" placeholder="Търси по норма, размер или код">
+      <button type="submit" class="paner-search__go" aria-label="Търси"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+    </form>
+  </div>
+
+  {%- if use_menu -%}
+    {%- for link in section.settings.menu.links -%}
+      <section class="paner-catgroup">
+        <div class="paner-section__head">
+          <h2 class="paner-catgroup__title"><a href="{{ link.url }}">{{ link.title }}</a></h2>
+          <a class="paner-link" href="{{ link.url }}">Всички →</a>
+        </div>
+        {%- if link.links.size > 0 -%}
+          <ul class="paner-cats" role="list">
+            {%- for child in link.links -%}
+              {%- render 'paner-collection-card', title: child.title, url: child.url, c: child.object, link_type: child.type, icon: section.settings.icon -%}
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </section>
+    {%- endfor -%}
+  {%- else -%}
+    <ul class="paner-cats" role="list">
+      {%- for c in collections -%}
+        {%- if skip contains c.handle or c.products_count == 0 -%}{%- continue -%}{%- endif -%}
+        {%- render 'paner-collection-card', title: c.title, url: c.url, c: c, link_type: 'collection_link', icon: section.settings.icon -%}
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "PanER · Каталог",
+  "class": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Заглавие", "default": "Каталог" },
+    { "type": "richtext", "id": "text", "label": "Текст", "default": "<p>Всички групи крепежни елементи по DIN, ISO и EN.</p>" },
+    { "type": "link_list", "id": "menu", "label": "Подреди по меню", "info": "Групира категориите по менюто (напр. main-menu с подменюта). Празно = всички колекции." },
+    {
+      "type": "select", "id": "icon", "label": "Илюстрация, ако няма снимка", "default": "bolt",
+      "options": [
+        { "value": "bolt", "label": "Болт" }, { "value": "nut", "label": "Гайка" }, { "value": "washer", "label": "Шайба" },
+        { "value": "screw", "label": "Винт" }, { "value": "rod", "label": "Шпилка" }, { "value": "rivet", "label": "Нит" },
+        { "value": "anchor", "label": "Анкер" }, { "value": "turnbuckle", "label": "Обтегач" }
+      ]
+    }
+  ]
+}
+{% endschema %}

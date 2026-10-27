@@ -1,0 +1,55 @@
+{
+  "sections": {
+    "main": {
+      "type": "paner-downloads",
+      "settings": {},
+      "blocks": {
+        "file_1": {
+          "type": "file",
+          "settings": {
+            "group": "Каталози",
+            "title": "Каталог крепежни елементи 2026",
+            "description": "PDF · всички норми и размери",
+            "format": "PDF"
+          }
+        },
+        "file_2": {
+          "type": "file",
+          "settings": {
+            "group": "Сертификати",
+            "title": "Сертификат ISO 9001",
+            "description": "Система за управление на качеството",
+            "format": "PDF"
+          }
+        },
+        "file_3": {
+          "type": "file",
+          "settings": {
+            "group": "Сертификати",
+            "title": "Декларация за съответствие (CE)",
+            "description": "Болтове и гайки по DIN/ISO",
+            "format": "PDF"
+          }
+        },
+        "file_4": {
+          "type": "file",
+          "settings": {
+            "group": "Технически таблици",
+            "title": "Таблица за якост на болтове 8.8 / 10.9",
+            "description": "Моменти на затягане и натоварвания",
+            "format": "PDF"
+          }
+        }
+      },
+      "block_order": [
+        "file_1",
+        "file_2",
+        "file_3",
+        "file_4"
+      ]
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

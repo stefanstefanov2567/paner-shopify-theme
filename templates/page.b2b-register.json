@@ -1,0 +1,39 @@
+{
+  "sections": {
+    "main": {
+      "type": "paner-register",
+      "settings": {},
+      "blocks": {
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "title": "Изпратете заявка",
+            "text": "Данни на фирмата и лице за контакт."
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "title": "Проверка до 1 работен ден",
+            "text": "Потвърждаваме фирмата и ценовата група."
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "title": "Вход с имейл",
+            "text": "Влизате с код по имейл и виждате фирмените условия."
+          }
+        }
+      },
+      "block_order": [
+        "step_1",
+        "step_2",
+        "step_3"
+      ]
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

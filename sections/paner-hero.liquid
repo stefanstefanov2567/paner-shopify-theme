@@ -21,7 +21,7 @@
           <a class="button paner-btn--accent" href="{{ section.settings.button_link | default: routes.all_products_collection_url }}">{{ section.settings.button_label }}</a>
         {%- endif -%}
         {%- if section.settings.button2_label != blank -%}
-          <a class="button button--secondary paner-btn--ghost" href="{{ section.settings.button2_link | default: settings.inquiry_link }}">{{ section.settings.button2_label }}</a>
+          <a class="button button--secondary paner-btn--ghost" href="{{ section.settings.button2_link | default: settings.register_link | default: '/pages/registracia' }}">{{ section.settings.button2_label }}</a>
         {%- endif -%}
       </div>
       <ul class="paner-hero__usps" role="list">
@@ -124,7 +124,7 @@
     { "type": "richtext", "id": "text", "label": "Текст", "default": "<p>Над 15 000 артикула болтове, гайки, шайби и анкери. Изпратете запитване и получете фирмена оферта до 1 работен ден.</p>" },
     { "type": "text", "id": "button_label", "label": "Бутон 1 — текст", "default": "Разгледай каталога" },
     { "type": "url", "id": "button_link", "label": "Бутон 1 — линк" },
-    { "type": "text", "id": "button2_label", "label": "Бутон 2 — текст", "default": "Изпрати запитване" },
+    { "type": "text", "id": "button2_label", "label": "Бутон 2 — текст", "default": "Регистрация на фирма" },
     { "type": "url", "id": "button2_link", "label": "Бутон 2 — линк" },
     { "type": "color_scheme", "id": "color_scheme", "label": "Цветова схема", "default": "scheme-3" },
     { "type": "header", "content": "Избор по параметри" },

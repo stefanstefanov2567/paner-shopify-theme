@@ -28,6 +28,12 @@
         "info": "Бутонът „Запитване“ в хедъра води тук."
       },
       {
+        "type": "url",
+        "id": "register_link",
+        "label": "Страница „Регистрация на фирма“",
+        "info": "Страница с шаблон page.b2b-register (напр. /pages/registracia)."
+      },
+      {
         "type": "header",
         "content": "Контакти"
       },

@@ -70,6 +70,17 @@
               </ul>
             {%- endif -%}
           </nav>
+          {%- if shop.customer_accounts_enabled -%}
+            <div class="paner-drawer__account">
+              {%- if customer -%}
+                <a class="button button--secondary" href="{{ routes.account_url }}">Моят профил</a>
+                <a class="button button--secondary" href="{{ routes.account_logout_url }}">Изход</a>
+              {%- else -%}
+                <a class="button paner-btn--dark" href="{{ routes.account_login_url }}">Вход</a>
+                <a class="button button--secondary" href="{{ settings.register_link | default: '/pages/registracia' }}">Регистрация на фирма</a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
           <div class="paner-drawer__contact">
             {%- if phone != blank -%}<a href="tel:{{ phone | remove: ' ' }}">{{ phone }}</a>{%- endif -%}
             {%- if email != blank -%}<a href="mailto:{{ email }}">{{ email }}</a>{%- endif -%}
@@ -120,13 +131,49 @@
 
       <div class="paner-hdr__actions">
         {%- if shop.customer_accounts_enabled -%}
-          <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="paner-hbtn paner-hbtn--ghost">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
-            <span class="paner-hbtn__txt">
-              <small>Фирмен профил</small>
-              <b>{%- if customer -%}{{ customer.first_name | default: customer.company_available_locations.first.company.name | default: 'Моят профил' }}{%- else -%}Вход / Регистрация{%- endif -%}</b>
-            </span>
-          </a>
+          {%- liquid
+            assign register_url = settings.register_link | default: '/pages/registracia'
+            assign approved = false
+            if customer and settings.price_tag != blank
+              assign ptag = settings.price_tag | strip
+              if customer.tags contains ptag
+                assign approved = true
+              endif
+            endif
+          -%}
+          <details class="paner-acc" data-paner-dd>
+            <summary class="paner-hbtn paner-hbtn--ghost" aria-label="Фирмен профил">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+              <span class="paner-hbtn__txt">
+                <small>Фирмен профил</small>
+                <b>{%- if customer -%}{{ customer.first_name | default: customer.name | default: 'Моят профил' }}{%- else -%}Вход / Регистрация{%- endif -%}</b>
+              </span>
+            </summary>
+            <div class="paner-acc__menu">
+              {%- if customer -%}
+                <div class="paner-acc__who">
+                  <b>{{ customer.name | default: customer.email }}</b>
+                  <span>{{ customer.email }}</span>
+                  {%- if settings.price_tag != blank -%}
+                    {%- if approved -%}
+                      <span class="paner-acc__status is-ok">Одобрен фирмен клиент</span>
+                    {%- else -%}
+                      <span class="paner-acc__status">Фирменият профил очаква одобрение</span>
+                    {%- endif -%}
+                  {%- endif -%}
+                </div>
+                <a class="paner-acc__link" href="{{ routes.account_url }}">Моят профил и поръчки</a>
+                <a class="paner-acc__link" href="{{ routes.cart_url }}">Текущо запитване ({{ cart.items.size }})</a>
+                {%- unless approved -%}<a class="paner-acc__link" href="{{ register_url }}">Данни на фирмата / одобрение</a>{%- endunless -%}
+                <a class="paner-acc__link paner-acc__link--muted" href="{{ routes.account_logout_url }}">Изход</a>
+              {%- else -%}
+                <p class="paner-acc__lead">Влезте с имейл — ще получите код за вход. Без парола.</p>
+                <a class="button button--full-width paner-btn--dark" href="{{ routes.account_login_url }}">Вход</a>
+                <a class="button button--secondary button--full-width" href="{{ register_url }}">Регистрация на фирма</a>
+                <p class="paner-acc__fine">Фирмените клиенти получават индивидуални цени след одобрение.</p>
+              {%- endif -%}
+            </div>
+          </details>
         {%- endif -%}
         <a href="{{ routes.cart_url }}" class="paner-hbtn paner-hbtn--accent" id="cart-icon-bubble">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
