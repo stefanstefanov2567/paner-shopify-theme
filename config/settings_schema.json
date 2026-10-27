@@ -1,11 +1,53 @@
 [
   {
     "name": "theme_info",
-    "theme_name": "Dawn",
+    "theme_name": "PanER",
     "theme_version": "16.0.0",
-    "theme_author": "Shopify",
+    "theme_author": "Stefan Stefanov",
     "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
     "theme_support_url": "https://support.shopify.com/"
+  },
+  {
+    "name": "PanER · Каталог",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Каталожен режим"
+      },
+      {
+        "type": "checkbox",
+        "id": "catalog_mode",
+        "label": "Каталожен режим (без цени и количка)",
+        "default": true,
+        "info": "Скрива цените, количката и бутоните за покупка. Вместо тях клиентите изпращат запитване."
+      },
+      {
+        "type": "url",
+        "id": "inquiry_link",
+        "label": "Страница за запитване",
+        "info": "Бутонът „Запитване“ в хедъра води тук."
+      },
+      {
+        "type": "header",
+        "content": "Контакти"
+      },
+      {
+        "type": "text",
+        "id": "paner_phone",
+        "label": "Телефон"
+      },
+      {
+        "type": "text",
+        "id": "paner_email",
+        "label": "Имейл"
+      },
+      {
+        "type": "text",
+        "id": "paner_topbar",
+        "label": "Текст в горната лента",
+        "default": "Само за фирми · каталог с над 15 000 артикула · запитване до 1 работен ден"
+      }
+    ]
   },
   {
     "name": "t:settings_schema.logo.name",

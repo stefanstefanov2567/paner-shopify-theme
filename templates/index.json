@@ -1,75 +1,228 @@
 {
   "sections": {
-    "image_banner": {
-      "type": "image-banner",
+    "hero": {
+      "type": "paner-hero",
+      "settings": {},
       "blocks": {
-        "heading": {
-          "type": "heading",
+        "usp_1": {
+          "type": "usp",
           "settings": {
-            "heading": "Browse our latest products",
-            "heading_size": "h0"
+            "text": "Доставка в цялата страна"
           }
         },
-        "button": {
-          "type": "buttons",
+        "usp_2": {
+          "type": "usp",
           "settings": {
-            "button_label_1": "Shop all",
-            "button_link_1": "shopify://collections/all",
-            "button_style_secondary_1": true,
-            "button_label_2": "",
-            "button_link_2": "",
-            "button_style_secondary_2": false
+            "text": "Сертификати 3.1"
+          }
+        },
+        "usp_3": {
+          "type": "usp",
+          "settings": {
+            "text": "Оферта до 1 работен ден"
           }
         }
       },
       "block_order": [
-        "heading",
-        "button"
-      ],
-      "settings": {
-        "image_overlay_opacity": 40,
-        "image_height": "large",
-        "desktop_content_position": "bottom-center",
-        "show_text_box": false,
-        "image_behavior": "none",
-        "desktop_content_alignment": "center",
-        "color_scheme": "scheme-3",
-        "mobile_content_alignment": "center",
-        "stack_images_on_mobile": false,
-        "show_text_below": false
-      }
+        "usp_1",
+        "usp_2",
+        "usp_3"
+      ]
     },
-    "featured_collection": {
-      "type": "featured-collection",
-      "settings": {
-        "title": "Featured products",
-        "heading_size": "h2",
-        "description": "",
-        "show_description": false,
-        "description_style": "body",
-        "collection": "all",
-        "products_to_show": 8,
-        "columns_desktop": 4,
-        "color_scheme": "scheme-1",
-        "full_width": false,
-        "show_view_all": true,
-        "view_all_style": "solid",
-        "enable_desktop_slider": false,
-        "swipe_on_mobile": false,
-        "image_ratio": "adapt",
-        "image_shape": "default",
-        "show_secondary_image": true,
-        "show_vendor": false,
-        "show_rating": false,
-        "quick_add": "none",
-        "columns_mobile": "2",
-        "padding_top": 44,
-        "padding_bottom": 36
-      }
+    "categories": {
+      "type": "paner-categories",
+      "settings": {},
+      "blocks": {
+        "category_1": {
+          "type": "category",
+          "settings": {
+            "title": "Болтове",
+            "norms": "DIN 931, 933, 912, 7985, 7991",
+            "icon": "bolt"
+          }
+        },
+        "category_2": {
+          "type": "category",
+          "settings": {
+            "title": "Гайки",
+            "norms": "DIN 934, 985, 6923, 1587, 315",
+            "icon": "nut"
+          }
+        },
+        "category_3": {
+          "type": "category",
+          "settings": {
+            "title": "Шайби",
+            "norms": "DIN 125, 127, 9021, 6798, EPDM",
+            "icon": "washer"
+          }
+        },
+        "category_4": {
+          "type": "category",
+          "settings": {
+            "title": "Винтове",
+            "norms": "За дърво, гипсокартон, ламарина",
+            "icon": "screw"
+          }
+        },
+        "category_5": {
+          "type": "category",
+          "settings": {
+            "title": "Шпилки",
+            "norms": "DIN 975 · 4.8, 8.8, 10.9, A2, A4",
+            "icon": "rod"
+          }
+        },
+        "category_6": {
+          "type": "category",
+          "settings": {
+            "title": "Нитове",
+            "norms": "Поп нитове ST/ST, AL/ST, A2/A2",
+            "icon": "rivet"
+          }
+        },
+        "category_7": {
+          "type": "category",
+          "settings": {
+            "title": "Анкерна техника",
+            "norms": "Стоманени, химически, дюбели",
+            "icon": "anchor"
+          }
+        },
+        "category_8": {
+          "type": "category",
+          "settings": {
+            "title": "Обтегачи",
+            "norms": "DIN 1480 · око, кука",
+            "icon": "turnbuckle"
+          }
+        }
+      },
+      "block_order": [
+        "category_1",
+        "category_2",
+        "category_3",
+        "category_4",
+        "category_5",
+        "category_6",
+        "category_7",
+        "category_8"
+      ]
+    },
+    "steps": {
+      "type": "paner-steps",
+      "settings": {},
+      "blocks": {
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "title": "Намерете артикула",
+            "text": "<p>Търсене по норма, размер или код и филтри по диаметър, дължина, клас и покритие.</p>"
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "title": "Изпратете запитване",
+            "text": "<p>Посочете количество в бройки, кутии, кашони или палети — или пратете целия си списък.</p>"
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "title": "Получете оферта",
+            "text": "<p>Фирмена цена, наличност и срок на доставка — до 1 работен ден.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "step_1",
+        "step_2",
+        "step_3"
+      ]
+    },
+    "list": {
+      "type": "paner-list-inquiry",
+      "settings": {}
+    },
+    "faq": {
+      "type": "paner-faq",
+      "settings": {},
+      "blocks": {
+        "question_1": {
+          "type": "question",
+          "settings": {
+            "question": "Защо на сайта няма цени?",
+            "answer": "<p>Работим с фирми и цените зависят от количеството, честотата на поръчките и условията на доставка. Изпратете запитване и ще получите индивидуална оферта до 1 работен ден.</p>"
+          }
+        },
+        "question_2": {
+          "type": "question",
+          "settings": {
+            "question": "Продавате ли на физически лица?",
+            "answer": "<p>Основно работим с фирми, но можете да изпратите запитване и като физическо лице — ще ви отговорим с възможностите.</p>"
+          }
+        },
+        "question_3": {
+          "type": "question",
+          "settings": {
+            "question": "Какво е минималното количество?",
+            "answer": "<p>Минималното количество е една опаковка (кутия). За по-големи количества — кашон или палет — цената е по-изгодна.</p>"
+          }
+        },
+        "question_4": {
+          "type": "question",
+          "settings": {
+            "question": "Каква е разликата между кутия, кашон и палет?",
+            "answer": "<p>Кутията е най-малката опаковка (напр. 100 бр.). Кашонът съдържа няколко кутии, а палетът — няколко десетки кашона. Точните бройки са посочени при всеки артикул.</p>"
+          }
+        },
+        "question_5": {
+          "type": "question",
+          "settings": {
+            "question": "За колко време се доставя?",
+            "answer": "<p>Наличните артикули се доставят в рамките на 1–2 работни дни в цялата страна. За артикули по поръчка срокът се уточнява в офертата.</p>"
+          }
+        },
+        "question_6": {
+          "type": "question",
+          "settings": {
+            "question": "Предлагате ли сертификати 3.1?",
+            "answer": "<p>Да. При заявка прилагаме сертификат за качество 3.1 и декларация за съответствие към доставката.</p>"
+          }
+        },
+        "question_7": {
+          "type": "question",
+          "settings": {
+            "question": "Мога ли да пратя целия си списък наведнъж?",
+            "answer": "<p>Да — поставете артикулите и количествата в полето „Запитване по списък“ или ги изпратете на имейл като Excel файл.</p>"
+          }
+        },
+        "question_8": {
+          "type": "question",
+          "settings": {
+            "question": "Как да намеря аналог по DIN, ISO или БДС?",
+            "answer": "<p>Потърсете по номера на нормата — напр. „933“ или „ISO 4017“. Ако не намирате аналог, опишете артикула в запитването и ще ви предложим еквивалент.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "question_1",
+        "question_2",
+        "question_3",
+        "question_4",
+        "question_5",
+        "question_6",
+        "question_7",
+        "question_8"
+      ]
     }
   },
   "order": [
-    "image_banner",
-    "featured_collection"
+    "hero",
+    "categories",
+    "steps",
+    "list",
+    "faq"
   ]
 }

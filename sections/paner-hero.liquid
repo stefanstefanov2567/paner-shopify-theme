@@ -1,0 +1,159 @@
+{%- comment -%} PanER · Hero с избор по параметри {%- endcomment -%}
+{%- liquid
+  assign norms = section.settings.norms | split: ','
+  assign diameters = section.settings.diameters | split: ','
+  assign lengths = section.settings.lengths | split: ','
+  assign classes = section.settings.classes | split: ','
+  assign coatings = section.settings.coatings | split: ','
+-%}
+<section class="paner-hero color-{{ section.settings.color_scheme }} gradient">
+  <div class="page-width paner-hero__inner">
+    <div class="paner-hero__copy">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="paner-eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h1 class="paner-hero__title">{{ section.settings.heading }}</h1>
+      {%- if section.settings.text != blank -%}
+        <div class="paner-hero__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+      <div class="paner-hero__actions">
+        {%- if section.settings.button_label != blank -%}
+          <a class="button paner-btn--accent" href="{{ section.settings.button_link | default: routes.all_products_collection_url }}">{{ section.settings.button_label }}</a>
+        {%- endif -%}
+        {%- if section.settings.button2_label != blank -%}
+          <a class="button button--secondary paner-btn--ghost" href="{{ section.settings.button2_link | default: settings.inquiry_link }}">{{ section.settings.button2_label }}</a>
+        {%- endif -%}
+      </div>
+      <ul class="paner-hero__usps" role="list">
+        {%- for block in section.blocks -%}
+          <li {{ block.shopify_attributes }}>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+            {{ block.settings.text }}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+
+    {%- if section.settings.show_picker -%}
+      <form class="paner-picker" action="{{ routes.search_url }}" method="get" role="search" data-paner-picker>
+        <input type="hidden" name="type" value="product">
+        <input type="hidden" name="options[prefix]" value="last">
+        <input type="hidden" name="q" value="" data-paner-picker-q>
+        <div class="paner-picker__head">
+          <h2 class="paner-picker__title">{{ section.settings.picker_heading }}</h2>
+        </div>
+        <div class="paner-picker__grid">
+          <div class="paner-picker__field">
+            <label for="PickerNorm-{{ section.id }}">Норма</label>
+            <select id="PickerNorm-{{ section.id }}" data-part>
+              <option value="">Всички</option>
+              {%- for o in norms -%}<option value="{{ o | strip | escape }}">{{ o | strip }}</option>{%- endfor -%}
+            </select>
+          </div>
+          <div class="paner-picker__field">
+            <label for="PickerDia-{{ section.id }}">Диаметър</label>
+            <select id="PickerDia-{{ section.id }}" data-part data-join="x">
+              <option value="">Всички</option>
+              {%- for o in diameters -%}<option value="{{ o | strip | escape }}">{{ o | strip }}</option>{%- endfor -%}
+            </select>
+          </div>
+          <div class="paner-picker__field">
+            <label for="PickerLen-{{ section.id }}">Дължина, мм</label>
+            <select id="PickerLen-{{ section.id }}" data-part data-after-x>
+              <option value="">Всички</option>
+              {%- for o in lengths -%}<option value="{{ o | strip | escape }}">{{ o | strip }}</option>{%- endfor -%}
+            </select>
+          </div>
+          <div class="paner-picker__field">
+            <label for="PickerCls-{{ section.id }}">Клас на якост</label>
+            <select id="PickerCls-{{ section.id }}" data-part>
+              <option value="">Всички</option>
+              {%- for o in classes -%}<option value="{{ o | strip | escape }}">{{ o | strip }}</option>{%- endfor -%}
+            </select>
+          </div>
+        </div>
+        {%- if coatings.size > 0 -%}
+          <fieldset class="paner-picker__chips">
+            <legend>Покритие</legend>
+            {%- for o in coatings -%}
+              <label class="paner-chip">
+                <input type="radio" name="paner-coating-{{ section.id }}" value="{{ o | strip | escape }}" data-part-radio>
+                <span>{{ o | strip }}</span>
+              </label>
+            {%- endfor -%}
+          </fieldset>
+        {%- endif -%}
+        <button type="submit" class="button button--full-width paner-picker__submit">Покажи артикулите</button>
+      </form>
+    {%- endif -%}
+  </div>
+</section>
+
+<script>
+  (function () {
+    var form = document.querySelector('#shopify-section-{{ section.id }} [data-paner-picker]');
+    if (!form) return;
+    form.addEventListener('submit', function () {
+      var parts = [];
+      var selects = form.querySelectorAll('select[data-part]');
+      var dia = '', len = '';
+      selects.forEach(function (s) {
+        if (!s.value) return;
+        if (s.hasAttribute('data-join')) { dia = s.value; return; }
+        if (s.hasAttribute('data-after-x')) { len = s.value; return; }
+        parts.push(s.value);
+      });
+      if (dia && len) parts.splice(1, 0, dia + 'x' + len);
+      else if (dia) parts.splice(1, 0, dia);
+      else if (len) parts.push(len);
+      var radio = form.querySelector('input[data-part-radio]:checked');
+      if (radio) parts.push(radio.value);
+      form.querySelector('[data-paner-picker-q]').value = parts.join(' ');
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "PanER · Hero",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Надзаглавие", "default": "ТЪРГОВИЯ НА ЕДРО · DIN · ISO · EN" },
+    { "type": "text", "id": "heading", "label": "Заглавие", "default": "Нормализиран крепеж за фирми — по кутия, кашон и палет." },
+    { "type": "richtext", "id": "text", "label": "Текст", "default": "<p>Над 15 000 артикула болтове, гайки, шайби и анкери. Изпратете запитване и получете фирмена оферта до 1 работен ден.</p>" },
+    { "type": "text", "id": "button_label", "label": "Бутон 1 — текст", "default": "Разгледай каталога" },
+    { "type": "url", "id": "button_link", "label": "Бутон 1 — линк" },
+    { "type": "text", "id": "button2_label", "label": "Бутон 2 — текст", "default": "Изпрати запитване" },
+    { "type": "url", "id": "button2_link", "label": "Бутон 2 — линк" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Цветова схема", "default": "scheme-3" },
+    { "type": "header", "content": "Избор по параметри" },
+    { "type": "checkbox", "id": "show_picker", "label": "Покажи формата", "default": true },
+    { "type": "text", "id": "picker_heading", "label": "Заглавие на формата", "default": "Избор по параметри" },
+    { "type": "text", "id": "norms", "label": "Норми (със запетая)", "default": "DIN 931,DIN 933,DIN 934,DIN 125,DIN 127,DIN 912,DIN 975" },
+    { "type": "text", "id": "diameters", "label": "Диаметри (със запетая)", "default": "M4,M5,M6,M8,M10,M12,M14,M16,M20,M24" },
+    { "type": "text", "id": "lengths", "label": "Дължини (със запетая)", "default": "10,12,16,20,25,30,35,40,45,50,60,70,80,90,100,120,140,160,200" },
+    { "type": "text", "id": "classes", "label": "Класове (със запетая)", "default": "4.8,5.6,8.8,10.9,12.9,A2,A4" },
+    { "type": "text", "id": "coatings", "label": "Покрития (със запетая)", "default": "Черно,Поцинковано,Горещо поцинковано,Неръждаема" },
+    { "type": "paragraph", "content": "Формата търси по заглавието на продуктите, напр. „DIN 933 M10x40 8.8“. Когато настроим филтрите по метаполета, ще я свържем директно с тях." }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "Предимство",
+      "limit": 4,
+      "settings": [ { "type": "text", "id": "text", "label": "Текст", "default": "Сертификати 3.1" } ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "PanER · Hero",
+      "blocks": [
+        { "type": "usp", "settings": { "text": "Доставка в цялата страна" } },
+        { "type": "usp", "settings": { "text": "Сертификати 3.1" } },
+        { "type": "usp", "settings": { "text": "Оферта до 1 работен ден" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

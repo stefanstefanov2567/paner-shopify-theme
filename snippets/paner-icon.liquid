@@ -1,0 +1,22 @@
+{%- comment -%}
+  PanER · линейни илюстрации на категории.
+  Accepts: name (bolt|nut|washer|screw|rod|rivet|anchor|turnbuckle), class
+{%- endcomment -%}
+{%- case name -%}
+  {%- when 'bolt' -%}
+    <svg class="paner-icon {{ class }}" viewBox="0 0 120 60" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="6" y="9" width="22" height="42" rx="2"/><path d="M6 22h22M6 38h22"/><path d="M28 20h84l4 4v12l-4 4H28z"/><path d="M62 20l-4 20M68 20l-4 20M74 20l-4 20M80 20l-4 20M86 20l-4 20M92 20l-4 20M98 20l-4 20M104 20l-4 20M110 20l-4 20"/></g></svg>
+  {%- when 'nut' -%}
+    <svg class="paner-icon {{ class }}" viewBox="0 0 60 60" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M30 5 52 17.5v25L30 55 8 42.5v-25z"/><circle cx="30" cy="30" r="11"/><circle cx="30" cy="30" r="7.5" stroke-dasharray="3 2.5"/></g></svg>
+  {%- when 'washer' -%}
+    <svg class="paner-icon {{ class }}" viewBox="0 0 60 60" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="30" cy="30" r="23"/><circle cx="30" cy="30" r="10"/></g></svg>
+  {%- when 'screw' -%}
+    <svg class="paner-icon {{ class }}" viewBox="0 0 120 60" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 10v40l20-12V22z"/><path d="M26 22h64l24 8-24 8H26z"/><path d="M40 22l-5 16M50 22l-5 16M60 22l-5 16M70 22l-5 16M80 22l-5 16M90 22l-5 16"/><path d="M13 24v12"/></g></svg>
+  {%- when 'rod' -%}
+    <svg class="paner-icon {{ class }}" viewBox="0 0 120 60" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2"><path d="M6 21h108v18H6z"/><path d="M14 21l-4 18M22 21l-4 18M30 21l-4 18M38 21l-4 18M46 21l-4 18M54 21l-4 18M62 21l-4 18M70 21l-4 18M78 21l-4 18M86 21l-4 18M94 21l-4 18M102 21l-4 18M110 21l-4 18"/></g></svg>
+  {%- when 'rivet' -%}
+    <svg class="paner-icon {{ class }}" viewBox="0 0 120 60" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M30 10c-12 0-18 8-18 20s6 20 18 20z"/><path d="M30 22h44v16H30z"/><path d="M74 28h40"/><circle cx="114" cy="28" r="0.5"/><path d="M74 30h36"/></g></svg>
+  {%- when 'anchor' -%}
+    <svg class="paner-icon {{ class }}" viewBox="0 0 120 60" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M8 14h10v32H8z"/><path d="M18 22h18v16H18z"/><path d="M36 20h50l10 4v12l-10 4H36z"/><path d="M52 20v20M70 20v20"/><path d="M96 26h18v8H96"/></g></svg>
+  {%- when 'turnbuckle' -%}
+    <svg class="paner-icon {{ class }}" viewBox="0 0 120 60" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><circle cx="12" cy="30" r="8"/><path d="M20 30h12"/><path d="M32 18h56v24H32z"/><path d="M40 18v24M80 18v24"/><path d="M88 30h12"/><path d="M100 30c10 0 12 8 6 14"/></g></svg>
+{%- endcase -%}

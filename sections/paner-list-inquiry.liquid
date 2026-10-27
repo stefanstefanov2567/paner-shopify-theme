@@ -1,0 +1,53 @@
+{%- comment -%} PanER · Списък (поставяне от Excel) {%- endcomment -%}
+<section class="paner-section color-{{ section.settings.color_scheme }} gradient">
+  <div class="page-width">
+    <div class="paner-list">
+      <div class="paner-list__copy">
+        <span class="paner-list__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5"/></svg>
+        </span>
+        <div>
+          <h2 class="paner-list__title">{{ section.settings.heading }}</h2>
+          <div class="paner-section__sub">{{ section.settings.text }}</div>
+        </div>
+      </div>
+
+      {%- form 'contact', id: 'PanerListInquiry', class: 'paner-list__form' -%}
+        {%- if form.posted_successfully? -%}
+          <div class="paner-inquiry__success" role="status">
+            <strong>Списъкът е изпратен.</strong>
+            <span>Ще получите оферта до 1 работен ден.</span>
+          </div>
+        {%- else -%}
+          {%- if form.errors -%}
+            <div class="paner-inquiry__errors" role="alert">{{ form.errors | default_errors }}</div>
+          {%- endif -%}
+          <input type="hidden" name="contact[Тип]" value="Запитване по списък">
+          <label class="visually-hidden" for="PanerListBody">Списък с артикули</label>
+          <textarea class="paner-list__textarea" id="PanerListBody" name="contact[body]" rows="4" required placeholder="DIN 933 M10x40 8.8 Zn ; 400 бр.&#10;DIN 934 M10 ; 400 бр.&#10;DIN 125 10,5 ; 400 бр."></textarea>
+          <div class="paner-list__row">
+            <label class="visually-hidden" for="PanerListEmail">Имейл</label>
+            <input class="paner-list__input" type="email" id="PanerListEmail" name="contact[email]" required placeholder="Имейл за офертата" autocomplete="email">
+            <label class="visually-hidden" for="PanerListCompany">Фирма</label>
+            <input class="paner-list__input" type="text" id="PanerListCompany" name="contact[Фирма]" placeholder="Фирма" autocomplete="organization">
+            <button type="submit" class="button paner-btn--dark">Изпрати списъка</button>
+          </div>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "PanER · Списък",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Заглавие", "default": "Запитване по списък" },
+    { "type": "richtext", "id": "text", "label": "Текст", "default": "<p>Поставете артикулите и количествата директно от Excel — ще ви върнем оферта за целия списък.</p>" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Цветова схема", "default": "scheme-1" }
+  ],
+  "presets": [ { "name": "PanER · Списък" } ]
+}
+{% endschema %}

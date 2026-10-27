@@ -205,7 +205,7 @@
             }}
           </div>
         {%- else -%}
-          <span class="h2">{{ shop.name }}</span>
+          {%- render 'paner-logo', class: 'header__paner-logo', uid: 'h1' -%}
         {%- endif -%}
       </a>
       {%- if request.page_type == 'index' -%}
@@ -248,7 +248,7 @@
             }}
           </div>
         {%- else -%}
-          <span class="h2">{{ shop.name }}</span>
+          {%- render 'paner-logo', class: 'header__paner-logo', uid: 'h2' -%}
         {%- endif -%}
       </a>
       {%- if request.page_type == 'index' -%}
@@ -299,6 +299,11 @@
         {%- endcase -%}
       {%- endfor -%}
 
+      {%- if settings.catalog_mode -%}
+        <a href="{{ settings.inquiry_link | default: '/pages/contact' }}" class="button paner-header-cta small-hide">
+          Запитване
+        </a>
+      {%- else -%}
       <a href="{{ routes.cart_url }}" class="header__icon header__icon--cart link focus-inset" id="cart-icon-bubble">
         {% if cart == empty %}
           <span class="svg-wrapper">{{ 'icon-cart-empty.svg' | inline_asset_content }}</span>
@@ -315,6 +320,7 @@
           </div>
         {%- endif -%}
       </a>
+      {%- endif -%}
     </div>
   </header>
 </{{ header_tag }}>

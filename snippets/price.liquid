@@ -12,6 +12,7 @@
   Usage:
   {% render 'price', product: product %}
 {% endcomment %}
+{%- unless settings.catalog_mode -%}
 {%- liquid
   if use_variant
     assign target = product.selected_or_first_available_variant
@@ -123,3 +124,4 @@
     {%- endif -%}
   </div>
 {% endunless %}
+{%- endunless -%}

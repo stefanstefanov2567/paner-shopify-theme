@@ -3,18 +3,8 @@
     "main": {
       "type": "main-product",
       "blocks": {
-        "vendor": {
-          "type": "text",
-          "settings": {
-            "text": "{{ product.vendor }}",
-            "text_style": "uppercase"
-          }
-        },
         "title": {
           "type": "title"
-        },
-        "price": {
-          "type": "price"
         },
         "variant_picker": {
           "type": "variant_picker",
@@ -22,9 +12,6 @@
             "picker_type": "button",
             "swatch_shape": "circle"
           }
-        },
-        "quantity_selector": {
-          "type": "quantity_selector"
         },
         "buy_buttons": {
           "type": "buy_buttons",
@@ -41,15 +28,24 @@
           "settings": {
             "share_label": "Share"
           }
+        },
+        "sku": {
+          "type": "sku",
+          "settings": {}
+        },
+        "paner_specs": {
+          "type": "paner_specs",
+          "settings": {
+            "heading": "Технически параметри"
+          }
         }
       },
       "block_order": [
-        "vendor",
         "title",
-        "price",
+        "sku",
         "variant_picker",
-        "quantity_selector",
         "buy_buttons",
+        "paner_specs",
         "description",
         "share"
       ],

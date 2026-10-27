@@ -1,0 +1,102 @@
+{%- comment -%} PanER · Категории с илюстрации и норми {%- endcomment -%}
+<section class="paner-section color-{{ section.settings.color_scheme }} gradient">
+  <div class="page-width">
+    <div class="paner-section__head">
+      <div>
+        <h2 class="paner-section__title">{{ section.settings.heading }}</h2>
+        {%- if section.settings.subheading != blank -%}
+          <p class="paner-section__sub">{{ section.settings.subheading }}</p>
+        {%- endif -%}
+      </div>
+      {%- if section.settings.link_label != blank -%}
+        <a class="paner-link" href="{{ section.settings.link_url | default: routes.collections_url }}">{{ section.settings.link_label }} →</a>
+      {%- endif -%}
+    </div>
+
+    <ul class="paner-cats" role="list">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign c = block.settings.collection
+          assign title = block.settings.title | default: c.title | default: 'Категория'
+          assign url = c.url | default: routes.collections_url
+        -%}
+        <li {{ block.shopify_attributes }}>
+          <a class="paner-cat" href="{{ url }}">
+            <span class="paner-cat__media">
+              {%- if block.settings.image != blank -%}
+                {{ block.settings.image | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300, 600', sizes: '(min-width: 990px) 300px, 50vw', alt: title }}
+              {%- else -%}
+                {%- render 'paner-icon', name: block.settings.icon -%}
+              {%- endif -%}
+            </span>
+            <span class="paner-cat__row">
+              <strong class="paner-cat__title">{{ title }}</strong>
+              {%- if c != blank and section.settings.show_count -%}
+                <span class="paner-cat__count">{{ c.products_count }}</span>
+              {%- endif -%}
+            </span>
+            {%- if block.settings.norms != blank -%}
+              <span class="paner-cat__norms">{{ block.settings.norms }}</span>
+            {%- endif -%}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "PanER · Категории",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Заглавие", "default": "Категории" },
+    { "type": "text", "id": "subheading", "label": "Подзаглавие", "default": "Изберете група — филтрите по параметри са на следващата стъпка." },
+    { "type": "text", "id": "link_label", "label": "Линк — текст", "default": "Целият асортимент" },
+    { "type": "url", "id": "link_url", "label": "Линк" },
+    { "type": "checkbox", "id": "show_count", "label": "Показвай брой артикули", "default": true },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Цветова схема", "default": "scheme-1" }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Категория",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Колекция" },
+        { "type": "text", "id": "title", "label": "Заглавие (по избор)" },
+        { "type": "text", "id": "norms", "label": "Норми", "default": "DIN 931, 933, 912" },
+        {
+          "type": "select", "id": "icon", "label": "Илюстрация", "default": "bolt",
+          "options": [
+            { "value": "bolt", "label": "Болт" },
+            { "value": "nut", "label": "Гайка" },
+            { "value": "washer", "label": "Шайба" },
+            { "value": "screw", "label": "Винт" },
+            { "value": "rod", "label": "Шпилка" },
+            { "value": "rivet", "label": "Нит" },
+            { "value": "anchor", "label": "Анкер" },
+            { "value": "turnbuckle", "label": "Обтегач" }
+          ]
+        },
+        { "type": "image_picker", "id": "image", "label": "Снимка (заменя илюстрацията)" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "PanER · Категории",
+      "blocks": [
+        { "type": "category", "settings": { "title": "Болтове", "norms": "DIN 931, 933, 912, 7985, 7991", "icon": "bolt" } },
+        { "type": "category", "settings": { "title": "Гайки", "norms": "DIN 934, 985, 6923, 1587, 315", "icon": "nut" } },
+        { "type": "category", "settings": { "title": "Шайби", "norms": "DIN 125, 127, 9021, 6798, EPDM", "icon": "washer" } },
+        { "type": "category", "settings": { "title": "Винтове", "norms": "За дърво, гипсокартон, ламарина", "icon": "screw" } },
+        { "type": "category", "settings": { "title": "Шпилки", "norms": "DIN 975 · 4.8, 8.8, 10.9, A2, A4", "icon": "rod" } },
+        { "type": "category", "settings": { "title": "Нитове", "norms": "Поп нитове ST/ST, AL/ST, A2/A2", "icon": "rivet" } },
+        { "type": "category", "settings": { "title": "Анкерна техника", "norms": "Стоманени, химически, дюбели", "icon": "anchor" } },
+        { "type": "category", "settings": { "title": "Обтегачи", "norms": "DIN 1480 · око, кука", "icon": "turnbuckle" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

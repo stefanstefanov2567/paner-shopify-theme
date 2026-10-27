@@ -1,0 +1,54 @@
+{%- comment -%} PanER · Как работи (стъпки) {%- endcomment -%}
+<section class="paner-section color-{{ section.settings.color_scheme }} gradient">
+  <div class="page-width">
+    <div class="paner-steps">
+      <div class="paner-steps__intro">
+        <h2 class="paner-section__title">{{ section.settings.heading }}</h2>
+        {%- if section.settings.text != blank -%}
+          <div class="paner-section__sub">{{ section.settings.text }}</div>
+        {%- endif -%}
+      </div>
+      {%- for block in section.blocks -%}
+        <div class="paner-step" {{ block.shopify_attributes }}>
+          <span class="paner-step__num">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+          <h3 class="paner-step__title">{{ block.settings.title }}</h3>
+          <div class="paner-step__text">{{ block.settings.text }}</div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "PanER · Как работи",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Заглавие", "default": "Как работи за фирми" },
+    { "type": "richtext", "id": "text", "label": "Текст", "default": "<p>Без регистрация и без ангажимент — изпращате запитване, получавате оферта.</p>" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Цветова схема", "default": "scheme-2" }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Стъпка",
+      "limit": 4,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Заглавие", "default": "Стъпка" },
+        { "type": "richtext", "id": "text", "label": "Текст", "default": "<p>Описание на стъпката.</p>" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "PanER · Как работи",
+      "blocks": [
+        { "type": "step", "settings": { "title": "Намерете артикула", "text": "<p>Търсене по норма, размер или код и филтри по диаметър, дължина, клас и покритие.</p>" } },
+        { "type": "step", "settings": { "title": "Изпратете запитване", "text": "<p>Посочете количество в бройки, кутии, кашони или палети — или пратете целия си списък.</p>" } },
+        { "type": "step", "settings": { "title": "Получете оферта", "text": "<p>Фирмена цена, наличност и срок на доставка — до 1 работен ден.</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
